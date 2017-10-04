@@ -53,7 +53,7 @@ library(magrittr)
 - quality
     + should be discussed in advance
 - sufficiency
-    + "can the project be done with ths data?"
+    + "can the project be done with this data?"
     + use <font color = "orange">**several sources**</font>
 - reproducibility
     + try to get the data through R
@@ -70,18 +70,18 @@ library(magrittr)
 - feature engineering and splitting can be done later
 
 ## Grading - analysis
-- usage of model
+- usage of the model
     + should be discussed in advance
 - understanding the process
-    + all the CV proceses, parameter tuning, ...
-    + wWhy am I using this value for parameter "xy"?
+    + all the cross-validation, parameter tuning, ...
+    + why am I using this value for parameter "xy"?
     + if several possible values, <font color = "orange">**discuss**</font>
 - <font color = "orange">**don't erase used commands & comment extensively**</font>
     + I want to see all the used commands
-    + comment what is happening and how will you handle it
+    + comment what is happening and how to handle it
     + it is part of the flow of the project
     + helps me understand that you know what you are doing
-- model results interpratation
+- model results interpretation
 
 ## Grading - final output
 - presented in the class
@@ -89,7 +89,7 @@ library(magrittr)
 - prepare :
     + problem overview
     + methodology introduction and discussion
-    + nice visualisations (you want to sell our product)
+    + nice visualisations (you want to sell your product)
 
 ## Bonus points
 - occasional option to get some
@@ -100,7 +100,7 @@ library(magrittr)
 <!-- TODO grading system -->
 
 - this week:
-    + play the game **CastleOfR** (originally written by Giora Simchoni)
+    + play the game **CastleOfR** (originally written by [Giora Simchoni](https://github.com/gsimchoni/CastleOfR))
     + *what do the dragons like?*
     + email me the answer and get the points
     + 1 % up for the final grade
@@ -110,8 +110,6 @@ library(magrittr)
 ## Github
 - make an account (please fill in your full name)
 - [check the repo](https://github.com/MDA2018/lectures) (and watch it)
-
-<!-- TODO make that repo -->
 
 - download the slides (sources)
 - should you find any mistake in the materials
@@ -126,15 +124,16 @@ library(magrittr)
 
 <font size="24" color ="orange"> **Questions?** </font>  
 
+
 # ETL process
 
 ## The most important step of the project
-- find the data ?
-- find the best algorithm for the analysis ?
-- visualisation and meaningful insights ?
-- something completely different ?
+- find the data?
+- find the best algorithm for the analysis?
+- visualisation and meaningful insights?
+- something completely different?
 
-## Loading the data !
+## Loading the data!
 <img src="data/load_error.gif">
 
 ```{r test_anim, fig.show='animate', eval = FALSE}
@@ -175,10 +174,21 @@ read.table("data/load_error2.csv", fill = FALSE, skip = 1, nrows = 2)
 read.table("data/load_error3.csv", encoding = "UTF-8", stringsAsFactors = FALSE)
 ```
 
-## Large file?
+> - more on encoding [here](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/) & [here](http://kunststube.net/encoding/)
 
-<!-- TODO fread -->
-
+<!-- HOW DOES R SEE THOSE CHARACTERS NOW? -->
+```{r, eval = FALSE}
+test <- read.table("data/load_error3.csv", encoding = "UTF-8", stringsAsFactors = FALSE)
+test$V1
+```
 ## Unknown separators?
 
-<!-- TODO  readLines & fread -->
+<img src="data/load_error4.png">
+
+> - becomes problem with large files
+> - readLines again
+
+## Any other troubles?
+> - readLines
+> - fread (data.table package)
+> - <font color = "orange">**good luck** </font>
