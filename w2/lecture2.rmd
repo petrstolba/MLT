@@ -1,0 +1,160 @@
+---
+title: "Lecture 1"
+author: "Michal Kubi&#353;ta"
+date: "15 January 2017"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
+library(animation)
+library(magrittr)
+library(ggplot2)
+set.seed(123)
+```
+
+# Distance
+
+##  {.flexbox .vcenter}
+
+<font size="24" color ="orange"> **What is a distance?** </font>  
+
+## What is a distance? (i)
+
+Manhattan
+
+```{r distances - manhattan}
+D <- data.frame(a = c(1,2,2,3,3),
+                b = c(1,1,2,2,3))
+
+ggplot(D, aes(x = a, y = b))+
+      geom_line(color = "orange")+
+      coord_equal(ratio=1)+
+      geom_point(data = D[c(1, nrow(D)),], size = 2, color = "orange")
+```
+
+## What is a distance? (ii)
+
+Euclidean
+
+```{r distances - euclidean}
+# D <- data.frame(a = c(1,3),
+#                 b = c(1,3))
+
+D <- data.frame(a = seq(1,3, by = 0.1),
+                b = seq(1,3, by = 0.1))
+
+
+ggplot(D, aes(x = a, y = b))+
+      geom_line(color = "orange")+
+      geom_point(data = D[c(1,nrow(D)),], color = "orange")+
+      coord_equal(ratio=1)
+      
+```
+
+## What is a distance? (iii)
+
+Hamming distance
+$$H(x,y) = \sum_{i=1}^{n} 1_{x_{i} \ne y_{i}}$$
+
+## How about "distance" in mixed data?
+- similarity
+- scale dummies OR
+- Gower metric (scaled distances)
+
+$$G(x,y) = \frac{1}{n} \sum_{i=1}^{n} \frac{|x_{in} - x_{jn}|}{range(n)} $$
+
+# k - nearest neighbourhoods
+
+## What does it do?
+
+```{r knn_setup}
+a <- c(rnorm(20,1,1),rnorm(20,5,1))
+b <- c(rnorm(20,1,1),rnorm(20,5,1))
+c <- c(rep(1,20), rep(2,20))
+      
+D <- data.frame(a,b,c)
+
+point <- data.frame(a = 2, b = 4, c = 0)
+      
+ggplot(D, aes(x=a, y=b, color = as.factor(c))) +
+      geom_point() +
+      geom_point(data = point)
+
+```
+
+## Closest point?
+
+```{r 1nn_fig}
+D <- rbind(point, D)
+
+dist(D[,1:2]) %>%
+      as.matrix() %>%
+      .[-1,1] %>%
+      .[order(.)] %>%
+      names %>%
+      as.numeric() -> distInd
+
+ggplot(D, aes(x=a, y=b, color = as.factor(c))) +
+      geom_point() +
+      geom_point(data = point) +
+      geom_line(data = D[c(1,distInd[1]),], aes(x=a, y= b), inherit.aes = F, color = "gray45")
+```
+
+## Two closest points?
+
+```{r 2nn_fig}
+
+ggplot(D, aes(x=a, y=b, color = as.factor(c))) +
+      geom_point() +
+      geom_point(data = point) +
+      geom_line(data = D[c(1,distInd[1]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[2]),], aes(x=a, y= b), inherit.aes = F, color = "gray45")
+```
+
+## K closest points?
+
+```{r knn_fig}
+
+ggplot(D, aes(x=a, y=b, color = as.factor(c)))+ 
+      geom_point() +
+      geom_point(data = point) +
+      geom_line(data = D[c(1,distInd[1]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[2]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[3]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[4]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[5]),], aes(x=a, y= b), inherit.aes = F, color = "gray45")
+      
+```
+
+## Distance weights
+$$support(class) = \sum_{i=1} \frac {1}{dist_{i}}$$
+
+```{r}
+a1 <- runif(10, 0, 3)
+a <- c(a1, rnorm(20,5,1))
+b <- c(a1*2 + rnorm(10,0,0.3), rnorm(20,5,1))
+c <- c(rep(1,10), rep(2,20))
+
+D2 <- data.frame(a, b, c)
+
+point <- data.frame(a = 2.9, b = 5.8, c = 0)
+
+ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
+      geom_point()+
+      geom_point(data = point)
+      
+```
+
+## kNN algorithm
+- classic implementation: "class::knn"
+- *for each unlabeled point*
+    + *find k nearest labeled points*
+    + *assign weighted majority vote class*
+- greedy greedy algorithm
+- lazy learning
+- used for:
+    + recomender systems
+    + customer churn
