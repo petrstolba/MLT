@@ -20,11 +20,18 @@ library(magrittr)
 - Contact: michal.kubista@nielsen.com
 - Office hours: Monday 18:00 - 19:00
 - I'm bad with names ... *sorry*
-- <font color = "orange">**please include string "MDA2017" in your email subject** </font>
+- <font color = "orange">**please include string "MDA2018" in your email subject** </font>
 
 <!-- TODO edit the office hours -->
 
-## Content of the course
+## Organization
+- usual week: 2 lessons
+- additional lesson used to wrap up more complex topics (like this week)
+    + otherwise can be used for consultations (pre-agreed via email)
+
+<!-- TODO add days -->
+
+## Content
 - topics in marketing analysis
     + customer segmentation
     + pricing strategies
@@ -53,7 +60,7 @@ library(magrittr)
 - quality
     + should be discussed in advance
 - sufficiency
-    + "can the project be done with this data?"
+    + "can the analysis be done with this data?"
     + use <font color = "orange">**several sources**</font>
 - reproducibility
     + try to get the data through R
@@ -95,7 +102,7 @@ library(magrittr)
 - occasional option to get some
 - play a game, prove some theory, calculate, suggest approach
 - in a form of home assignments
-- achieving more than 100% results in some sweet reward
+- achieving more than 100% score results in some sweet reward
 
 <!-- TODO grading system -->
 
@@ -108,7 +115,7 @@ library(magrittr)
 <!-- TODO how much % for CastleOfR -->
 
 ## Github
-- make an account (please fill in your full name)
+- make an account (please fill in your full nme)
 - [check the repo](https://github.com/MDA2018/lectures) (and watch it)
 
 - download the slides (sources)
@@ -182,7 +189,7 @@ test <- read.table("data/lecture/load_error3.csv", encoding = "UTF-8", stringsAs
 test$V1
 ```
 ## Unknown separators?
-
+<!--TODO change file, so it contains commas-->
 <img src="data/lecture/load_error4.png">
 
 > - becomes problem with large files
