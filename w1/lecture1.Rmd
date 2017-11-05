@@ -90,6 +90,10 @@ library(magrittr)
     + helps me understand that you know what you are doing
 - model results interpretation
 
+## Why commenting? {.flexbox .vcenter}
+
+<img src="www/onlyGodKnows.jpg" align="center" height = "500">
+
 ## Grading - final output
 - presented in the class
 - co-evaluated by your classmates
@@ -141,7 +145,7 @@ library(magrittr)
 - something completely different?
 
 ## Loading the data!
-<img src="data/lecture/load_error.gif">
+<img src="www/load_error.gif">
 
 ```{r test_anim, fig.show='animate', eval = FALSE}
 
@@ -155,7 +159,7 @@ for(i in 1:nrow(mtcars)){
 - no metadata avaliable
 - file too large to be opened in common tools (notepad, excel)
 
-<img src="data/lecture/load_error.png">
+<img src="www/load_error.png">
 
 
 ## Column error? => header & fill
@@ -166,15 +170,15 @@ read.csv("data/lecture/load_error.csv", header = FALSE, fill = TRUE)
 
 ## Line-specific error? => skip & nrows
 
-<img src="data/lecture/load_error2.png">
+<img src="www/load_error2.png">
 ```{r readlines, echo = TRUE}
 read.table("data/lecture/load_error2.csv", fill = FALSE, skip = 1, nrows = 2)
 ```
 
 ## Encoding problem?
 
-<img src="data/lecture/load_error3.png">
-<img src="data/lecture/load_error3_2.png">  
+<img src="www/load_error3.png">
+<img src="www/load_error3_2.png">  
 
 ## Encoding solution
 ```{r, echo = TRUE}
@@ -190,7 +194,7 @@ test$V1
 ```
 ## Unknown separators?
 <!--TODO change file, so it contains commas-->
-<img src="data/lecture/load_error4.png">
+<img src="www/load_error4.png">
 
 > - becomes problem with large files
 > - readLines again
