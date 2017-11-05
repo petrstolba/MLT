@@ -1,5 +1,5 @@
 ---
-title: "Lecture 1"
+title: "Lecture 2"
 author: "Michal Kubi&#353;ta"
 date: "15 January 2017"
 output:
@@ -60,6 +60,7 @@ Hamming distance
 $$H(x,y) = \sum_{i=1}^{n} 1_{x_{i} \ne y_{i}}$$
 
 ## How about "distance" in mixed data?
+
 - similarity
 - scale dummies OR
 - Gower metric (scaled distances)
@@ -130,9 +131,10 @@ ggplot(D, aes(x=a, y=b, color = as.factor(c)))+
 ```
 
 ## Distance weights
+
 $$support(class) = \sum_{i=1} \frac {1}{dist_{i}}$$
 
-```{r}
+```{r knn_weight}
 a1 <- runif(10, 0, 3)
 a <- c(a1, rnorm(20,5,1))
 b <- c(a1*2 + rnorm(10,0,0.3), rnorm(20,5,1))
@@ -148,8 +150,9 @@ ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
       
 ```
 
-## kNN algorithm
-- classic implementation: "class::knn"
+## kNN algorithm summary
+
+- classic implementation in R: "class::knn"
 - *for each unlabeled point*
     + *find k nearest labeled points*
     + *assign weighted majority vote class*
@@ -158,3 +161,76 @@ ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
 - used for:
     + recomender systems
     + customer churn
+
+# Recommender Systems
+
+## Reccomendations?
+
+<img src="www/logo.jpg" width = "800">
+
+- what do those companies have in common?
+
+> - <font color="orange"> **RECOMMENDATIONS!** </font>
+
+## How to recommend?
+
+- popularity
+- collaborative
+- content
+
+## Datasets
+
+- collection of users "rating" a product (*always*)
+    + actual ratings
+    + spotify's <img src="www/spotify.png" height = "30">
+    + length watched
+    + (un)skipped
+- collection of product descriptions (features) (*content*)
+    + topic / genre
+    + actors
+    + other properties
+
+## Popularity
+
+- reccomend the most popular products
+- good start, insufficient on it's own
+
+## Content
+- find a product very similar to what the user likes
+- completely dependent on products properties data
+- classification problem (let's use kNN)
+
+
+## Collaborative
+- no content information!
+- user - user
+    + similar consumers choices
+    + find similar customers and recommend their favourites
+- item - item
+    + similar items
+    + find similar items (often positively rated together)
+    
+## Collaborative - how we do that?
+- co-occurence matrix
+
+```{r customer_history}
+M <-
+      matrix(
+            sample(c(0,1), 20, replace = T),
+             ncol = 4
+      )
+rownames(M) <- paste0(rep("u",5),1:5)
+
+colnames(M) <- paste0(rep("m",4),1:4)
+
+M
+```
+
+## Collaborative - how we do that? (ii)
+
+```{r co-occurence, echo = TRUE}
+
+M %*% t(M)
+t(M) %*% M
+
+```
