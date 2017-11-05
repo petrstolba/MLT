@@ -1,7 +1,7 @@
 ---
-title: "Lecture 2"
+title: "Lecture 3"
 author: "Michal Kubi&#353;ta"
-date: "15 January 2017"
+date: "23 January 2018"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -9,7 +9,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
-library(animation)
 library(magrittr)
 library(ggplot2)
 set.seed(123)

@@ -1,7 +1,7 @@
 #####################
-## Seminar 2       ##
+## Seminar 3       ##
 ## Michal Kubista  ##
-## 15 January 2017 ##
+## 23 January 2018 ##
 #####################
 
 setwd("w2/data")

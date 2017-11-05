@@ -1,7 +1,7 @@
 ####################
 ## Seminar 1      ##
 ## Michal Kubista ##
-## 3 January 2017 ##
+## 8 January 2018 ##
 ####################
 
 lapply(c("data.table","dplyr","magrittr","ggplot2"), require, character.only = T)
