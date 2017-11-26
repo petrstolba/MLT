@@ -1,11 +1,13 @@
 #####################
 ## Seminar 3       ##
 ## Michal Kubista  ##
-## 23 January 2018 ##
+## 22 January 2018 ##
 #####################
 
-setwd("w2/data")
-lapply(c("data.table","dplyr","magrittr","ggplot2", "purrr"), require, character.only = T)
+setwd("w3/data")
+lapply(
+      c("data.table","dplyr","magrittr","ggplot2", "purrr"),
+      require, character.only = T)
 
 #-- PART 1 - ETL ##############################################################
 
@@ -18,17 +20,18 @@ rm(url)
 list.files()
 newFiles <- list.files("ml-latest-small", full.names = TRUE)
 
+## move the files
 for(i in newFiles){
       new <- gsub("ml-latest-small/","",i)
       file.rename(i, new)
 }
 
-rm(i)
-rm(newFiles)
-
+## clean the directory
+rm(i, newFiles, new)
 file.remove(c("data.zip","links.csv","README.txt"))
 unlink("ml-latest-small", recursive = TRUE)
 
+## read input
 input <- map(list.files(),fread, data.table = F)
 names(input) <- list.files() %>% gsub(".csv","",.) 
 
@@ -96,7 +99,7 @@ reset_ID <- function(ids){
 movies %<>%
       filter(movieId != "65665" & movieId != "64997")
 
-## feature engineering
+## list of genres
 movies$genres %>% 
       strsplit("\\|") %>%
       unlist() %>% 
@@ -113,12 +116,14 @@ set_genre <- function(x){
             as.numeric()
 }
 
+## genres incidence matrix
 map(movies$genres, set_genre) %>% 
       unlist() %>% 
       matrix(nrow(movies),length(genres), byrow = T) -> genreTable
 
 colnames(genreTable) <- genres
 
+## add genres to movies
 movies <- cbind(movies, genreTable)
 
 rm(genres, genreTable, set_genre)
@@ -131,16 +136,20 @@ dim(ratings)
 ratings %>% str
 ratings %>% summary
 
+## column format
 ratings[,1:2] <-  apply(ratings[,1:2],2, as.character)
 
 ratings$timestamp %<>% as.POSIXct(origin = "1970-01-01")
 summary(ratings$timestamp)
 
+## unique per column
 map(ratings, ~length(unique(.)))
 
+## reset ID of duplicated movies
 ratings$movieId %<>% 
       reset_ID
 
+## check integrity
 anti_join(ratings, movies, by = "movieId")
 
 rm(reset_ID)
@@ -148,23 +157,28 @@ rm(reset_ID)
 #-- PART 2 - kNN: CONTENT BASED RECOMMENDER ###################################
 
 #--- 2.1 PREPARE DATA ---------------------------------------------------------
+## rating frequency
 ratings$userId %>% 
       table() %>% 
       as.data.frame() %>% View()
 
+# choose user
 ratings %>% 
       filter(userId == "547") -> rat547
 
+# user's rating overview
 rat547 %>% summary()
 seq(0.5,5,by=0.5) %>% summary()
 
 qqplot(rat547$rating, seq(0.5,5,by=0.5))
 lines(0:5,0:5)
 
+# rating over time
 ggplot(rat547, aes(x = timestamp, y = rating))+
       geom_line()+
       geom_smooth(method = "loess")
 
+# choose boundary
 rat547$class <- ifelse(rat547$rating > 4, 1,0)
 mean(rat547$class)
 
@@ -187,7 +201,11 @@ moviesTrain2 <- moviesTrain[-indexTrain1,]
 
 result <- c()
 for(i in 1:160){
-      moviesTrain2$new <- knn(moviesTrain1[,4:22], moviesTrain2[,4:22], moviesTrain1[,"class"], i)
+      moviesTrain2$new <-
+            knn(moviesTrain1[,4:22],
+                moviesTrain2[,4:22],
+                moviesTrain1[,"class"],
+                i)
       
       result[i] <-mean(moviesTrain2$new == moviesTrain2$class)
       print(result[i])
@@ -201,7 +219,8 @@ rm(result, moviesTrain1, moviesTrain2, indexTrain1, i)
 
 ##--- 2.3 RECOMMEND -----------------------------------------------------------
 
-moviesTest$new<- knn(moviesTrain[,4:22], moviesTest[,4:22], moviesTrain[,"class"], k)
+moviesTest$new <-
+      knn(moviesTrain[,4:22], moviesTest[,4:22], moviesTrain[,"class"], k)
 
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
 
@@ -230,34 +249,42 @@ ratM$movieId <- NULL
 ratM %<>% as.matrix()
 
 ##--- 3.2 - ITEM-ITEM ---------------------------------------------------------
+## way too much for my PC, need to filter
 ratMR <- ratM[1:1000,]
-## way too much for my PC
 
+## factorisation
 item <- ratMR %*% t(ratMR) 
+
+## erase self-incidence
 diag(item) <- 0
 
+## choose an user (287 works well)
 user <- ratings[sample(1:100000,1), "userId"]
-# 152
 
+## user movies
 ratings %>% 
       filter(userId == user) %>% 
       select(movieId) -> userMov
 
 userMov <- userMov$movieId
 
+## find movies in matrix and filter
 rownames(item) %in% userMov %>% which() -> indexCR
+itemChoice <- item[indexCR,indexCR]
 
-itemChoice <- item[indexCR,indexCR] 
-
-apply(itemChoice,1,which.max) %>% table -> bestPicks
+## for each movie, find the most similar one
+apply(itemChoice, 1, which.max) %>% table -> bestPicks
 bestPicks
 
+## find the best recommendation
 bestPicks %>% which.max() -> no1
 movies %>% 
       filter(movieId == no1)
 
+## what has the user already seen?
 movies %>%
       filter(movieId %in% userMov) %>% View()
+ratings[ratings$userId == user & ratings$movieId == no1,]
 
 rm(ratMR, item, userMov, indexCR, itemChoice, bestPicks, no1, user)
 
@@ -265,23 +292,30 @@ rm(ratMR, item, userMov, indexCR, itemChoice, bestPicks, no1, user)
 user <- t(ratM) %*% ratM
 diag(user) <- 0
 
+## choose one user (323)
 userID <- rownames(user)[sample(1:600,1)]
-#323
 
-user[,userID] %>% table() -> bestPicks
+## most similar users
+user[,userID] %>% table() %>% rev() -> bestPicks
 bestPicks
 
-user[,userID] %in% c(6,7) %>% which() -> userSim
+## at least 10 users
+index <- which.max(cumsum(bestPicks) >= 10)
+names(bestPicks) %>% as.numeric() %>% .[1:index] -> index
 
+user[,userID] %in% index %>% which() -> userSim
+
+## movies watched by similar users 
 ratings %>% 
       filter(userId %in% userSim) %>%
       select(movieId) %>%
       table() %>%
       as.data.frame(stringsAsFactors = FALSE) %>% 
       arrange(desc(Freq)) -> recom
-      
+
+## recommended movies
 View(movies %>% 
       filter(movieId %in% recom[1:10,1]))
 
-
+## what has the user watched
 movies[movies$movieId %in% ratings[ratings$userId == userID,"movieId"],] %>% View()
