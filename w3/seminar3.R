@@ -178,8 +178,8 @@ ggplot(rat547, aes(x = timestamp, y = rating))+
       geom_line()+
       geom_smooth(method = "loess")
 
-# choose boundary
-rat547$class <- ifelse(rat547$rating > 4, 1,0)
+# choose threshold
+rat547$class <- ifelse(rat547$rating > 4, 1, 0)
 mean(rat547$class)
 
 if(!require(class)){
