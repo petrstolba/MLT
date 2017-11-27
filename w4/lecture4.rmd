@@ -1,0 +1,316 @@
+---
+title: "Lecture 4"
+author: "Michal Kubi&#353;ta"
+date: "29 January 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
+library(magrittr)
+library(ggplot2)
+library(gganimate)
+set.seed(123)
+```
+
+## Structure
+1.  Clustering introduction
+2.  K-means 
+3.  Hierarchical method
+4.  DBSCAN
+
+# Clustering introduction
+
+## About clustering
+- the main topic in marketing
+    - cluster your customers
+    - cluster your products
+- unsupervised learning
+    - no learning the rules
+        - no predictions
+    - classify without training
+- objective: internally homogenous and externally heterogenous groups
+- highly sensitive to distance specification
+    - scalling!
+
+## Example
+```{r cluster_example_1, fig.width = 5, fig.align='center'}
+# simulate data
+a <- c(rnorm(10, 3), rnorm(10,6))
+b <- c(rnorm(10, 2), rnorm(10,4))
+l <- c(rep(0,10), rep(1,10))
+mat <- cbind(a,b,l) %>% as.data.frame()
+rm(a,b,l)
+
+#unclustered plot
+unClust <-
+      ggplot(mat,aes(x = a, y = b))+
+      geom_point(aes(shape = as.factor(l)), size = 3)+
+      theme(legend.position='none')
+
+unClust
+
+```
+
+## Kmeans way
+```{r cluster_example_2, fig.width = 10}
+#clustering (kmeans)
+clust <- kmeans(mat[,1:2],2)
+mat$lab <- clust$cluster
+
+addClust <-
+      ggplot(mat,aes(x = a, y = b, color = as.factor(lab)))+
+      geom_point(aes(shape = as.factor(l)), size = 3)+
+      geom_point(data = as.data.frame(clust$centers),
+                 aes(x=a, y=b),
+                 size = 4,
+                 inherit.aes = FALSE)+
+      theme(legend.position='none')
+
+gridExtra::grid.arrange(unClust, addClust, ncol=2)
+
+```
+
+## Solving practical problems
+- <font color = "orange">**!!! customer segmentation !!!** </font>
+    - RFV segmentations
+        - recency - frequency - value
+- product substitutions
+    - similar products bought in different baskets by same customers
+    - how to define the distance between butter and milk?
+- basket labelling
+    - re-supply, spontaneous, daily
+    - when are what types of baskets happening?
+        - special offers
+
+# Kmeans algorithm
+
+## Overview
+- segment data into **K** clusters
+- greedy: will cluster all observations
+    - outliers, bad data
+    - hard clustering
+- <font color = "orange"> **centers** </font>
+    - centroids of the clusters
+    - mean in all dimensions
+    
+## Algorithm
+1. choose **K** observations randomly
+2. update **centers**
+    + **for** each **observation**:
+        + calculate **distance** to each **center**
+        + assign observation to the closest **center** = clusters
+    + if no observation changes mebership
+        + **break**
+3. calculate the **centroid** of each cluster
+    + **centroids** will be assigned as new **centers**
+    + repeat from 2.
+    
+## First iteration
+```{r kMeans_prep, fig.width = 10}
+clustList <- list()
+points = 6:7
+cenList <- list(mat[points,1:2])
+# this should be random = sample
+
+for(i in 1:10){
+      # base table
+      clustList[[i]] <- mat[,1:2]
+      
+      # update centers
+      if (i > 1) {
+            clustList[[i]] <- rbind(clustList[[i]], centroids)
+            points = 21:22
+            cenList[[i]] <- centroids
+      }
+      
+      # find the distances
+      dist(clustList[[i]]) %>% 
+            as.matrix -> distMat
+      
+      clustList[[i]]$iter <- i
+      
+      clustList[[i]]$lab <-
+            (distMat[points[1],] - distMat[points[2],] > 0) %>%
+            as.numeric()
+      
+      # remove centroids
+      clustList[[i]] <- clustList[[i]][1:20,]
+      
+      # if no change of labels => break
+      if(i > 1){
+            if(sum(clustList[[i]]$lab == clustList[[i-1]]$lab) == 20){
+                  break()            
+            }
+      }
+      
+      # calculate centroids
+      centroids <- aggregate(. ~ lab, clustList[[i]], mean)[,c("a","b")]
+}
+
+# rbind all list content
+clustData <- do.call(rbind.data.frame, clustList)
+centData <- do.call(rbind.data.frame, cenList)
+centData$iter <- rep(1:4, each = 2)
+
+# plot first iteration
+ggplot(clustList[[1]], aes(x= a, y = b, color = as.factor(lab)))+
+      geom_point()+
+      geom_point(data = cenList[[1]], shape = 4, size = 4, stroke = 2, color = "#7CAE00")
+
+```
+
+## All iterations
+```{r kMeans_anim, fig.width = 10, fig.show='animate', interval = 1.5}
+kMeanPlot <-
+      ggplot(clustData, aes(x= a, y = b, color = as.factor(lab), frame = iter))+
+      geom_point()+
+      geom_point(data = centData, shape = 4, size = 4, stroke = 2, color = "#7CAE00")
+
+gganimate(kMeanPlot)
+```
+
+## Last iteration
+```{r kMeans_res, fig.width = 10}
+ggplot(clustList[[length(clustList)]], aes(x= a, y = b, color = as.factor(lab)))+
+      geom_point()+
+      geom_point(data = cenList[[length(cenList)]],
+                 shape = 4,
+                 size = 4,
+                 stroke = 2,
+                 color = "#7CAE00")
+```
+
+## Summary
+- classical implementation- stats::kmeans
+- forget the clusters, find the appropriate centers
+- algorithm assumptions:
+    - spherical data
+    - constant variance across variables
+    - similar number of members
+- greedy algorithm
+    - initialization problem
+- argument **K** needs to be optimised
+    - usually via elbow method (&#8594; seminar)
+    
+# Hierarchical method
+
+## Key words
+- dendogram
+- divisive or agglomerative
+- [linkage methods](http://uc-r.github.io/hc_clustering#algorithms)
+    - link to the picture on next slide
+
+## Linkage graphically
+<img src="www/linkage.png", height = "500", align = "center">
+
+## Overview
+- segment data into a hierarchy
+    - clusters needs to be chosen later 
+- greedy: will cluster all observations
+    - outliers visually distinguishable
+- assuming points always closer to **own label** than to **other label** observations
+
+## Algorithm - agglomerative
+1. Find the two closest points
+    + merge them into a cluster
+2. Repeat until only one cluster exists
+    + cluster distance based on linkage method
+
+- for divisive clustering
+    - start with one cluster
+    - run kMeans like routine
+
+## First merge
+```{r hclust_prep, fig.width = 10}
+# how many points to use?
+rowsN <- 20
+
+# distance matrix
+dist(mat[1:rowsN, 1:2], diag = F) %>% 
+      as.matrix() -> distMat
+
+# largest distance to the diagonal = (item1,item1) combinations
+diag(distMat) <- max(distMat) + 1
+
+index <- order(distMat)
+
+hclustList <- list()
+
+for (i in 1:200) {
+      hclustList[[i]] <- mat[1:rowsN,1:2]
+      
+      # import labels from previous iteration
+      if(i == 1){
+            hclustList[[i]]$lab <- 0
+      } else {
+            hclustList[[i]]$lab <- hclustList[[i-1]]$lab
+      }
+      
+      # mark iteration
+      hclustList[[i]]$iter <- i
+      
+      # which items are closest?
+      rInd <- (index[2*i] %/% rowsN) + 1
+      cInd <- index[2*i] %% rowsN
+      
+      # exception (if divisible, return max)
+      if(cInd == 0){
+            cInd <- rowsN
+      }
+      
+      # find labels and relabel
+      preClust <- hclustList[[i]][c(rInd,cInd),"lab"] %>% unique()
+      
+
+      if (max(preClust) == 0) {
+            # no previous labels
+            hclustList[[i]][c(rInd,cInd),"lab"] <- i
+      } else {
+            # merge labels
+            hclustList[[i]][c(rInd,cInd),"lab"] <- max(preClust)
+            preClust <- preClust[!preClust == 0]
+            hclustList[[i]][hclustList[[i]]$lab %in% preClust,"lab"] <- 
+                  max(preClust)
+      }
+      
+      # all clustered?
+      unLab <-
+            hclustList[[i]]$lab %>% 
+            unique() %>% 
+            length()
+      
+      if(unLab == 1){
+            break
+      }
+}
+
+hclustData <- do.call(rbind.data.frame,hclustList)
+
+ggplot(data = hclustList[[1]],
+       aes(x = a, y = b, color = as.factor(lab), frame = iter))+
+      geom_point(size = 4)+
+      theme(legend.position='none')
+```
+
+## All merges
+```{r hclust_anim, fig.width = 10, fig.show='animate', interval= 0.7}
+hclustPlot <-
+      ggplot(data = hclustData,
+             aes(x = a, y = b, color = as.factor(lab), frame = iter))+
+      geom_point(size = 3)+
+      theme(legend.position='none')
+
+gganimate(hclustPlot)
+```
+
+## Summary
+- classical implementation- stats::hclust
+- merge the points one by one into groups
+- greedy algorithm
+- where to split?
+    - usually via at maximum vertical distance (&#8594; seminar)
+    - or on the number of clusters you need
+      
