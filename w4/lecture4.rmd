@@ -7,13 +7,18 @@ output:
     widescreen: yes
 ---
 
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif", cache = TRUE)
 library(magrittr)
 library(ggplot2)
 library(gganimate)
+library(dbscan)
+library(ggforce)
 set.seed(123)
 ```
+
+
 
 ## Structure
 1.  Clustering introduction
@@ -66,8 +71,12 @@ addClust <-
       geom_point(data = as.data.frame(clust$centers),
                  aes(x=a, y=b),
                  size = 4,
+                 shape = 4,
+                 stroke = 2,
+                 color = "#7CAE00",
                  inherit.aes = FALSE)+
       theme(legend.position='none')
+
 
 gridExtra::grid.arrange(unClust, addClust, ncol=2)
 
@@ -95,7 +104,7 @@ gridExtra::grid.arrange(unClust, addClust, ncol=2)
 - <font color = "orange"> **centers** </font>
     - centroids of the clusters
     - mean in all dimensions
-    
+
 ## Algorithm
 1. choose **K** observations randomly
 2. update **centers**
@@ -157,17 +166,19 @@ centData$iter <- rep(1:4, each = 2)
 
 # plot first iteration
 ggplot(clustList[[1]], aes(x= a, y = b, color = as.factor(lab)))+
-      geom_point()+
-      geom_point(data = cenList[[1]], shape = 4, size = 4, stroke = 2, color = "#7CAE00")
-
+      geom_point(size = 3)+
+      geom_point(data = cenList[[1]],
+                 shape = 4, size = 4, stroke = 2, color = "#7CAE00")+
+      theme(legend.position='none')
 ```
 
 ## All iterations
 ```{r kMeans_anim, fig.width = 10, fig.show='animate', interval = 1.5}
 kMeanPlot <-
       ggplot(clustData, aes(x= a, y = b, color = as.factor(lab), frame = iter))+
-      geom_point()+
-      geom_point(data = centData, shape = 4, size = 4, stroke = 2, color = "#7CAE00")
+      geom_point(size = 3)+
+      geom_point(data = centData, shape = 4, size = 4, stroke = 2, color = "#7CAE00")+
+      theme(legend.position='none')
 
 gganimate(kMeanPlot)
 ```
@@ -175,12 +186,10 @@ gganimate(kMeanPlot)
 ## Last iteration
 ```{r kMeans_res, fig.width = 10}
 ggplot(clustList[[length(clustList)]], aes(x= a, y = b, color = as.factor(lab)))+
-      geom_point()+
+      geom_point(size = 3)+
       geom_point(data = cenList[[length(cenList)]],
-                 shape = 4,
-                 size = 4,
-                 stroke = 2,
-                 color = "#7CAE00")
+                 shape = 4, size = 4, stroke = 2, color = "#7CAE00")+
+      theme(legend.position='none')
 ```
 
 ## Summary
@@ -291,7 +300,7 @@ hclustData <- do.call(rbind.data.frame,hclustList)
 
 ggplot(data = hclustList[[1]],
        aes(x = a, y = b, color = as.factor(lab), frame = iter))+
-      geom_point(size = 4)+
+      geom_point(size = 3)+
       theme(legend.position='none')
 ```
 
@@ -313,4 +322,155 @@ gganimate(hclustPlot)
 - where to split?
     - usually via at maximum vertical distance (&#8594; seminar)
     - or on the number of clusters you need
+
+# DBSCAN
+
+## Overview
+- going through the dataset looking for large density groups
+    - density based on parameters
+        - **eps** = distance
+        - **minPoints** = number of points
+    - check if there is at least minPoints in **eps** around chosen point
+- core, border, outlier points
+    - core = point with at least **minPoints** around
+    - border = point at least **eps** far from core point
+        - less than **minPoints** around
+    - outlier = point further than **eps** to any core point
+        - less than **minPoints** around
+    
+## Algorithm
+1. Choose the first **point**
+    + mark it as **visited**
+    + find **nearby points** (closer than **eps**) and count them
+        + ignore if less than **minPoints** (outlier)
+    + else **label chosen point** and **all nearby points** as **cluster_x**
+2. For each **unvisited point** in **cluster_x**
+    + find **nearby points** and count them
+        + if less than **minPoints**
+            + **border point**
+        + else assign **nearby points** to **cluster_x**
+3. **Break** when all **points visited**
+
+
+
+## First iteration
+```{r dbscan_prep, fig.width = 10}
+# arguments
+eps <- 1.3
+minP <- 3
+
+# distance matrix
+dist(mat[, 1:2], diag = F) %>% 
+      as.matrix() -> distMat
+
+# initialization
+dbList <- list()
+sphere <- list()
+
+for (i in 1:20) {
+      # first initialization
+      if(i == 1){
+            dbList[[i]] <- mat[,1:2]
+            dbList[[i]]$visited <- 0
+            dbList[[i]]$lab <- 0
+      } else {
+            dbList[[i]] <- dbList[[i-1]]
+      }
+      dbList[[i]]$iter <- i
       
+      # remove spheres with visited points
+      sphereLen <- c()
+      for(j in seq_along(sphere)){
+            sphere[[j]] <- sphere[[j]][!sphere[[j]] %in% visited]
+            sphereLen[j] <- length(sphere[[j]])
+      }
+      sphere <- sphere[sphereLen != 0]
+      
+      # if no previous spheres
+      if (length(sphere) == 0) {
+            
+            # choose random unvisited point
+            unVisited <- sum(dbList[[i]]$visited == 0)
+            indexPoint <- sample(unVisited, 1)
+            chosenPoint <-
+                  dbList[[i]][dbList[[i]]$visited == 0,][indexPoint,] %>% 
+                  rownames() %>% as.numeric()
+            
+      } else  {
+            # else choose from sphere
+            chosenPoint <- sphere[[1]][1]
+            sphere[[1]] <- sphere[[1]][-1]
+            
+      }
+      
+      # mark point as visited
+      dbList[[i]]$visited[chosenPoint] <- 1
+      
+      # distances to the chosen point
+      distRow <- distMat[chosenPoint,]
+      
+      # how many points are nearby
+      nPoints <- sum(distRow < eps) - 1
+      
+      # only if enough points nearby
+      if (nPoints >= minP) {
+            # create a sphere (all nearby points)
+            sphere[[length(sphere)+1]] <- which(distRow < eps)
+            
+            # what are the clusters of those points?
+            preLabs <-
+                  dbList[[i]][sphere[[length(sphere)]],]$lab
+            
+            # if points do not have any cluster
+            if(max(preLabs) == 0){
+                  # assign them to new cluster
+                  dbList[[i]][sphere[[length(sphere)]],]$lab <- i
+            } else {
+                  # else assign only those who are not part of any cluster
+                  dbList[[i]][
+                            sphere[[length(sphere)]],
+                              ]$lab[
+                                    which(preLabs == 0)
+                                    ] <- max(preLabs)
+            }
+      }
+      
+      # update visited
+      visited <- which(dbList[[i]]$visited==1)
+      
+      # break if all labeled
+      if(!0 %in% dbList[[i]]$lab){
+            break
+      }
+}
+
+dbData <- do.call(rbind.data.frame, dbList)
+
+visit <- dbList[[1]][dbList[[1]]$visited == 1,] %>% as.data.frame()
+
+ggplot(dbList[[1]], aes(x = a, y = b, color = as.factor(lab)))+
+      geom_point(size = 3)+
+      geom_circle(data = visit,
+                  aes(x0 = a, y0 = b, r = eps), inherit.aes = FALSE)+
+      theme(legend.position='none')
+```
+
+## All iterations
+```{r dbscan_anim, fig.width = 10, fig.show='animate', interval = 1.3}
+dbPlot <- ggplot(dbData, aes(x = a, y = b, color = as.factor(lab), frame = iter))+
+      geom_point(size = 3)+
+      theme(legend.position='none')
+
+gganimate(dbPlot)
+```
+
+## Summary
+- classical implementation- dbscan::dbscan
+- more [flexible](http://scikit-learn.org/stable/modules/clustering.html) than kMeans or hclust
+- need to choose the parameters
+    - eps estimated using dbscan::kNNdist
+    - minPoints based on subject matter
+- deterministic, but!
+    - re-arranging the data can change the clusters
+    - some point labels based on "who reaches them first"
+        - therefore can be problematic for smaller datasets
