@@ -51,9 +51,9 @@ rm(a,b,l)
 
 #unclustered plot
 unClust <-
-      ggplot(mat,aes(x = a, y = b))+
-      geom_point(aes(shape = as.factor(l)), size = 3)+
-      theme(legend.position='none')
+      ggplot(mat,aes(x = a, y = b)) +
+      geom_point(aes(shape = as.factor(l)), size = 3) +
+      theme(legend.position = 'none')
 
 unClust
 
@@ -66,19 +66,19 @@ clust <- kmeans(mat[,1:2],2)
 mat$lab <- clust$cluster
 
 addClust <-
-      ggplot(mat,aes(x = a, y = b, color = as.factor(lab)))+
-      geom_point(aes(shape = as.factor(l)), size = 3)+
+      ggplot(mat,aes(x = a, y = b, color = as.factor(lab))) +
+      geom_point(aes(shape = as.factor(l)), size = 3) +
       geom_point(data = as.data.frame(clust$centers),
-                 aes(x=a, y=b),
+                 aes(x = a, y = b),
                  size = 4,
                  shape = 4,
                  stroke = 2,
                  color = "#7CAE00",
-                 inherit.aes = FALSE)+
-      theme(legend.position='none')
+                 inherit.aes = FALSE) +
+      theme(legend.position = 'none')
 
 
-gridExtra::grid.arrange(unClust, addClust, ncol=2)
+gridExtra::grid.arrange(unClust, addClust, ncol = 2)
 
 ```
 
@@ -124,7 +124,7 @@ points = 6:7
 cenList <- list(mat[points,1:2])
 # this should be random = sample
 
-for(i in 1:10){
+for (i in 1:10) {
       # base table
       clustList[[i]] <- mat[,1:2]
       
@@ -149,8 +149,8 @@ for(i in 1:10){
       clustList[[i]] <- clustList[[i]][1:20,]
       
       # if no change of labels => break
-      if(i > 1){
-            if(sum(clustList[[i]]$lab == clustList[[i-1]]$lab) == 20){
+      if (i > 1) {
+            if (sum(clustList[[i]]$lab == clustList[[i - 1]]$lab) == 20) {
                   break()            
             }
       }
@@ -165,31 +165,31 @@ centData <- do.call(rbind.data.frame, cenList)
 centData$iter <- rep(1:4, each = 2)
 
 # plot first iteration
-ggplot(clustList[[1]], aes(x= a, y = b, color = as.factor(lab)))+
-      geom_point(size = 3)+
+ggplot(clustList[[1]], aes(x = a, y = b, color = as.factor(lab))) +
+      geom_point(size = 3) +
       geom_point(data = cenList[[1]],
-                 shape = 4, size = 4, stroke = 2, color = "#7CAE00")+
-      theme(legend.position='none')
+                 shape = 4, size = 4, stroke = 2, color = "#7CAE00") +
+      theme(legend.position = 'none')
 ```
 
 ## All iterations
 ```{r kMeans_anim, fig.width = 10, fig.show='animate', interval = 1.5}
 kMeanPlot <-
-      ggplot(clustData, aes(x= a, y = b, color = as.factor(lab), frame = iter))+
-      geom_point(size = 3)+
-      geom_point(data = centData, shape = 4, size = 4, stroke = 2, color = "#7CAE00")+
-      theme(legend.position='none')
+      ggplot(clustData, aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
+      geom_point(size = 3) +
+      geom_point(data = centData, shape = 4, size = 4, stroke = 2, color = "#7CAE00") +
+      theme(legend.position = 'none')
 
 gganimate(kMeanPlot)
 ```
 
 ## Last iteration
 ```{r kMeans_res, fig.width = 10}
-ggplot(clustList[[length(clustList)]], aes(x= a, y = b, color = as.factor(lab)))+
-      geom_point(size = 3)+
+ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))) +
+      geom_point(size = 3) +
       geom_point(data = cenList[[length(cenList)]],
-                 shape = 4, size = 4, stroke = 2, color = "#7CAE00")+
-      theme(legend.position='none')
+                 shape = 4, size = 4, stroke = 2, color = "#7CAE00") +
+      theme(legend.position = 'none')
 ```
 
 ## Summary
@@ -252,10 +252,10 @@ for (i in 1:200) {
       hclustList[[i]] <- mat[1:rowsN,1:2]
       
       # import labels from previous iteration
-      if(i == 1){
+      if (i == 1) {
             hclustList[[i]]$lab <- 0
       } else {
-            hclustList[[i]]$lab <- hclustList[[i-1]]$lab
+            hclustList[[i]]$lab <- hclustList[[i - 1]]$lab
       }
       
       # mark iteration
@@ -266,7 +266,7 @@ for (i in 1:200) {
       cInd <- index[2*i] %% rowsN
       
       # exception (if divisible, return max)
-      if(cInd == 0){
+      if (cInd == 0) {
             cInd <- rowsN
       }
       
@@ -291,7 +291,7 @@ for (i in 1:200) {
             unique() %>% 
             length()
       
-      if(unLab == 1){
+      if (unLab == 1) {
             break
       }
 }
@@ -299,18 +299,18 @@ for (i in 1:200) {
 hclustData <- do.call(rbind.data.frame,hclustList)
 
 ggplot(data = hclustList[[1]],
-       aes(x = a, y = b, color = as.factor(lab), frame = iter))+
-      geom_point(size = 3)+
-      theme(legend.position='none')
+       aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
+      geom_point(size = 3) +
+      theme(legend.position = 'none')
 ```
 
 ## All merges
 ```{r hclust_anim, fig.width = 10, fig.show='animate', interval= 0.7}
 hclustPlot <-
       ggplot(data = hclustData,
-             aes(x = a, y = b, color = as.factor(lab), frame = iter))+
-      geom_point(size = 3)+
-      theme(legend.position='none')
+             aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
+      geom_point(size = 3) +
+      theme(legend.position = 'none')
 
 gganimate(hclustPlot)
 ```
@@ -369,18 +369,18 @@ sphere <- list()
 
 for (i in 1:20) {
       # first initialization
-      if(i == 1){
+      if (i == 1) {
             dbList[[i]] <- mat[,1:2]
             dbList[[i]]$visited <- 0
             dbList[[i]]$lab <- 0
       } else {
-            dbList[[i]] <- dbList[[i-1]]
+            dbList[[i]] <- dbList[[i - 1]]
       }
       dbList[[i]]$iter <- i
       
       # remove spheres with visited points
       sphereLen <- c()
-      for(j in seq_along(sphere)){
+      for (j in seq_along(sphere)) {
             sphere[[j]] <- sphere[[j]][!sphere[[j]] %in% visited]
             sphereLen[j] <- length(sphere[[j]])
       }
@@ -415,14 +415,14 @@ for (i in 1:20) {
       # only if enough points nearby
       if (nPoints >= minP) {
             # create a sphere (all nearby points)
-            sphere[[length(sphere)+1]] <- which(distRow < eps)
+            sphere[[length(sphere) + 1]] <- which(distRow < eps)
             
             # what are the clusters of those points?
             preLabs <-
                   dbList[[i]][sphere[[length(sphere)]],]$lab
             
             # if points do not have any cluster
-            if(max(preLabs) == 0){
+            if (max(preLabs) == 0) {
                   # assign them to new cluster
                   dbList[[i]][sphere[[length(sphere)]],]$lab <- i
             } else {
@@ -436,10 +436,10 @@ for (i in 1:20) {
       }
       
       # update visited
-      visited <- which(dbList[[i]]$visited==1)
+      visited <- which(dbList[[i]]$visited == 1)
       
       # break if all labeled
-      if(!0 %in% dbList[[i]]$lab){
+      if (!0 %in% dbList[[i]]$lab) {
             break
       }
 }
@@ -448,18 +448,20 @@ dbData <- do.call(rbind.data.frame, dbList)
 
 visit <- dbList[[1]][dbList[[1]]$visited == 1,] %>% as.data.frame()
 
-ggplot(dbList[[1]], aes(x = a, y = b, color = as.factor(lab)))+
-      geom_point(size = 3)+
+ggplot(dbList[[1]], aes(x = a, y = b, color = as.factor(lab))) +
+      geom_point(size = 3) +
       geom_circle(data = visit,
-                  aes(x0 = a, y0 = b, r = eps), inherit.aes = FALSE)+
-      theme(legend.position='none')
+                  aes(x0 = a, y0 = b, r = eps), inherit.aes = FALSE) +
+      theme(legend.position = 'none')
 ```
 
 ## All iterations
 ```{r dbscan_anim, fig.width = 10, fig.show='animate', interval = 1.3}
-dbPlot <- ggplot(dbData, aes(x = a, y = b, color = as.factor(lab), frame = iter))+
-      geom_point(size = 3)+
-      theme(legend.position='none')
+visits <- dbData[dbData$visited == 1,]
+
+dbPlot <- ggplot(dbData, aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
+      geom_point(size = 3) +
+      theme(legend.position = 'none')
 
 gganimate(dbPlot)
 ```
