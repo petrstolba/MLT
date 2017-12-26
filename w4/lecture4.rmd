@@ -9,16 +9,16 @@ output:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4", cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
+                      cache = TRUE, fig.width = 10)
 library(magrittr)
 library(ggplot2)
 library(gganimate)
 library(dbscan)
 library(ggforce)
+library(gridExtra)
 set.seed(123)
 ```
-
-
 
 ## Structure
 1.  Clustering introduction
@@ -60,7 +60,7 @@ unClust
 ```
 
 ## Kmeans way
-```{r cluster_example_2, fig.width = 10}
+```{r cluster_example_2}
 #clustering (kmeans)
 clust <- kmeans(mat[,1:2],2)
 mat$lab <- clust$cluster
@@ -118,7 +118,7 @@ gridExtra::grid.arrange(unClust, addClust, ncol = 2)
     + repeat from 2.
     
 ## First iteration
-```{r kMeans_prep, fig.width = 10}
+```{r kMeans_prep}
 clustList <- list()
 points = 6:7
 cenList <- list(mat[points,1:2])
@@ -173,7 +173,7 @@ ggplot(clustList[[1]], aes(x = a, y = b, color = as.factor(lab))) +
 ```
 
 ## All iterations
-```{r kMeans_anim, fig.width = 10, fig.show='animate', interval = 1.5}
+```{r kMeans_anim, fig.show='animate', interval = 1.5}
 kMeanPlot <-
       ggplot(clustData, aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
       geom_point(size = 3) +
@@ -184,7 +184,7 @@ gganimate(kMeanPlot)
 ```
 
 ## Last iteration
-```{r kMeans_res, fig.width = 10}
+```{r kMeans_res}
 ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))) +
       geom_point(size = 3) +
       geom_point(data = cenList[[length(cenList)]],
@@ -210,7 +210,7 @@ ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))
 - dendogram
 - divisive or agglomerative
 - [linkage methods](http://uc-r.github.io/hc_clustering#algorithms)
-    - link to the picture on next slide
+    - link to the picture on the next slide
 
 ## Linkage graphically
 <img src="www/linkage.png", height = "500", align = "center">
@@ -233,7 +233,7 @@ ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))
     - run kMeans like routine
 
 ## First merge
-```{r hclust_prep, fig.width = 10}
+```{r hclust_prep}
 # how many points to use?
 rowsN <- 20
 
@@ -305,7 +305,7 @@ ggplot(data = hclustList[[1]],
 ```
 
 ## All merges
-```{r hclust_anim, fig.width = 10, fig.show='animate', interval= 0.7}
+```{r hclust_anim, fig.show='animate', interval= 0.7}
 hclustPlot <-
       ggplot(data = hclustData,
              aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
@@ -313,6 +313,14 @@ hclustPlot <-
       theme(legend.position = 'none')
 
 gganimate(hclustPlot)
+```
+
+## Dendogram
+```{r hclust_dend, fig.height = 6}
+mat[,1:2] %>% 
+  dist() %>% 
+  hclust(method = "single") %>% 
+  plot(hang = -1, main = NULL, sub = NA)
 ```
 
 ## Summary
@@ -354,7 +362,7 @@ gganimate(hclustPlot)
 
 
 ## First iteration
-```{r dbscan_prep, fig.width = 10}
+```{r dbscan_prep}
 # arguments
 eps <- 1.3
 minP <- 3
@@ -456,7 +464,7 @@ ggplot(dbList[[1]], aes(x = a, y = b, color = as.factor(lab))) +
 ```
 
 ## All iterations
-```{r dbscan_anim, fig.width = 10, fig.show='animate', interval = 1.3}
+```{r dbscan_anim, fig.show='animate', interval = 1.3}
 visits <- dbData[dbData$visited == 1,]
 
 dbPlot <- ggplot(dbData, aes(x = a, y = b, color = as.factor(lab), frame = iter)) +
