@@ -1,0 +1,166 @@
+---
+title: "Lecture 5"
+author: "Michal Kubi&#353;ta"
+date: "5 February 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
+                      cache = TRUE)
+library(magrittr)
+library(ggplot2)
+library(gganimate)
+# library(gridExtra)
+```
+
+## Structure
+1. Regression
+2. Pricing
+
+# Regression
+
+##  {.flexbox .vcenter}
+
+<font size="24" color="orange"> **You tell me...** </font>
+
+## Econometric approach
+OLS
+
+- statistical method
+- assumptions (Gauss-Markov)
+    1. linear relationship
+        - transformations
+    2. zero expected error ($E(\epsilon_{i}) = 0$)
+        - intercept
+    3. no perfect multicollinearity (full X matrix rank)
+    4. <font color="orange">**homoskedasticity**</font> ($E(\epsilon_{i}^{2}) = const$)
+        - slope
+        
+## OLS estimation
+$$\hat\beta = (X^{T}X)^{-1}X^{T}y$$
+**n** observations, **k** variables (\* = OK for small **k**)
+
+- $X^T \; complextity \; O(nk)$ *
+- $X^{T}X = T_{k*k} \; complexity \; O(n^{2})$ <font color="red">**!**</font>
+- $T^{-1} = U_{k*k} \; complexity \; O(k^{3})$ *
+- $UX^{T} = V_{k*n} \; complexity \; O(k^{2}n)$ *
+- $Vy = W_{k*1} \; complexity \; O(kn)$ *
+
+>- what if **k** is not small?
+
+
+## Setup the estimation of the linear relationship
+ how to uniquely describe a line (2D) ?
+ 
+>- 2 parameters, slope and a point
+>- there is only 1 parameter to estimate - why?
+>- $(\bar X,\bar Y)$
+
+## (i) random guess
+
+```{r rndAnim, fig.show='animate'}
+rand <- list()
+
+xhat <- mean(mtcars$drat)
+yhat <- mean(mtcars$wt)
+xmin <- min(mtcars$drat)
+xmax <- max(mtcars$drat)
+
+for(i in 1:10){
+  slope <- runif(1,-10,10)
+  ymax <- yhat + slope*(xmax - xhat)
+  ymin <- yhat + slope*(xmin - xhat)
+  rand[[i]] <- rbind(c(xmin, ymin, i),c(xmax, ymax, i))
+}
+
+rand <- do.call(rbind.data.frame, rand)
+colnames(rand) <- c("x","y","iter")
+
+rndPlot <-
+  ggplot(rand, aes(x = x, y = y, frame = iter))+
+  geom_line()+
+  geom_point(data = mtcars, aes(x = drat, y = wt), inherit.aes = F)
+
+gganimate(rndPlot)
+```
+
+## (ii) random guess + evolution
+
+- save the parameters and SSR of first iteration
+- if other parameters lead to lower SSR
+    - rewrite original
+- <font color="orange">**very simple**</font> MCMC process
+  
+## (iii) random guess + evolution + reproduction
+
+1. generate many random "estimates" of slope
+2. find the best individuals
+    - less then threshold SSR
+    - or given number of best-fit individuals
+3. let them breed
+    - averaging, linear combinations
+4. find the best individuals of the extended population
+5. repeat 3. and 4. until convergence / other condition
+- simple evolution algorithm
+
+## Evolution estimation
+
+```{r evoAnim, fig.show='animate'}
+xhat <- mean(mtcars$drat)
+yhat <- mean(mtcars$wt)
+xmin <- rep(min(mtcars$drat), 4)
+xmax <- rep(max(mtcars$drat), 4)
+
+evo <- list()
+
+for(i in 1:10){
+  if(i == 1){
+    slope <- runif(10,-10,10)
+  } else{
+    slope <- c(slope, (slope[1]+slope[-1])/2)
+  }
+  
+  SSR <- c()
+  for(j in slope){
+    SSR <- c(SSR, sum((mtcars$wt - (mtcars$drat - xhat) * j - yhat)^2))
+  }
+  
+  parents <- order(SSR)[1:4]
+  
+  slope <- slope[parents]
+  
+  ymax <- yhat + slope*(xmax - xhat)
+  ymin <- yhat + slope*(xmin - xhat)
+  iter <- i
+  col <- rep(1:4, each = 2)
+  
+  evo[[i]] <- cbind(c(rbind(xmin,xmax)), c(rbind(ymin, ymax)), iter, col)
+  
+}
+evo <- do.call(rbind.data.frame, evo)
+colnames(evo) <- c("x", "y", "iter", "col")
+
+
+evoPlot <-
+  ggplot(evo, aes(x = x, y = y, frame = iter, col = as.factor(col)))+
+  geom_line()+
+  geom_point(data = mtcars, aes(x = drat, y = wt), inherit.aes = F)+
+  theme(legend.position = 'none')
+
+gganimate(evoPlot)
+```
+
+## (iv) gradient descend
+1. calculate the gradient of the function
+    - $SSR = \sum_i (y_{i} - \hat y_{i})^{2} =
+    \sum_i (y_{i} - (b_{0} + b_{1}x_{i}))^{2} =$  
+    $\sum_i (y_{i} - (\hat y - b_{1} \hat x) - b_{1}x_{i})^{2} = \sum_i (y_{i} - \hat y - b_{1}(x_{i} - \hat x))^{2}$
+    - $\nabla SSR = \frac{\partial SSR}{\partial b_{1}} = H(b_{1})$
+2. generate initial random "estimate" of slope = $b$
+3. move a little in the direction of the gradient
+    - $b_{new} = b - \alpha H(b)$
+    - $\alpha$ = parameter
