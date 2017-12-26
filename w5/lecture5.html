@@ -108,7 +108,7 @@
 
 </article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section" class="flexbox vcenter">
 
-<p><font size="24" color="orange"> <strong>You tell me&#8230;</strong> </font></p>
+<p><font size="24" color="orange"> <strong>You tell me&#8230;</strong><br/>recall you statistics / econometrics class </font></p>
 
 </article></slide><slide class=""><hgroup><h2>Econometric approach</h2></hgroup><article  id="econometric-approach">
 
@@ -162,6 +162,7 @@
 <li>2 parameters, slope and a point</li>
 <li>there is only 1 parameter to estimate - why?</li>
 <li>\((\bar X,\bar Y)\)</li>
+<li>optimisation task</li>
 </ul>
 
 </article></slide><slide class=""><hgroup><h2>(i) random guess</h2></hgroup><article  id="i-random-guess">
@@ -175,12 +176,13 @@
 </article></slide><slide class=""><hgroup><h2>(ii) random guess + evolution</h2></hgroup><article  id="ii-random-guess-evolution">
 
 <ul>
-<li>save the parameters and SSR of first iteration</li>
+<li>save the parameters and SSR of first iteration - best estimation</li>
 <li>if other parameters lead to lower SSR
 
 <ul>
-<li>rewrite original</li>
+<li>rewrite the best estimation</li>
 </ul></li>
+<li>new estimation close to the parameters of the best estimation</li>
 <li><font color="orange"><strong>very simple</strong></font> MCMC process</li>
 </ul>
 
@@ -200,7 +202,7 @@
 <li>averaging, linear combinations</li>
 </ul></li>
 <li>find the best individuals of the extended population</li>
-<li>repeat 3. and 4. until convergence / other condition</li>
+<li>repeat 3. and 4. until convergence / stopping condition</li>
 </ol>
 
 <ul>
@@ -215,22 +217,100 @@
 
 </video>
 
-</article></slide><slide class=""><hgroup><h2>(iv) gradient descend</h2></hgroup><article  id="iv-gradient-descend">
+</article></slide><slide class=""><hgroup><h2>(iv) gradient descent</h2></hgroup><article  id="iv-gradient-descent">
 
 <ol>
 <li>calculate the gradient of the function
 
 <ul>
-<li>\(SSR = \sum_i (y_{i} - \hat y_{i})^{2} = \sum_i (y_{i} - (b_{0} + b_{1}x_{i}))^{2} =\)<br/>\(\sum_i (y_{i} - (\hat y - b_{1} \hat x) - b_{1}x_{i})^{2} = \sum_i (y_{i} - \hat y - b_{1}(x_{i} - \hat x))^{2}\)</li>
-<li>\(\nabla SSR = \frac{\partial SSR}{\partial b_{1}} = H(b_{1})\)</li>
+<li>\(SSR = \sum_i (y_{i} - \hat y_{i})^{2} = \sum_i (y_{i} - (a + bx_{i}))^{2} =\)<br/>\(\sum_i (y_{i} - (\hat y - b \hat x) - bx_{i})^{2} = \sum_i (y_{i} - \hat y - b(x_{i} - \hat x))^{2}\)</li>
+<li>\(\nabla SSR = \frac{\partial SSR}{\partial b} = H(b)\)</li>
 </ul></li>
-<li>generate initial random &quot;estimate&quot; of slope = \(b\)</li>
+<li>generate initial random &quot;estimate&quot; of slope = \(b_{0}\)</li>
 <li>move a little in the direction of the gradient
 
 <ul>
-<li>\(b_{new} = b - \alpha H(b)\)</li>
+<li>\(b_{n} = b_{n-1} - \alpha H(b)\)</li>
+<li>\(\alpha = parameter\)</li>
 </ul></li>
-</ol></article></slide>
+<li>repeat 3. until convergence / stopping condition</li>
+</ol>
+
+</article></slide><slide class=""><hgroup><h2>Differences</h2></hgroup><article  id="differences">
+
+<ul>
+<li>for the purpose of fitting the linear relationship (no inference)
+
+<ul>
+<li>no assumptions</li>
+</ul></li>
+<li>for inference (prediction)
+
+<ul>
+<li>mostly care about homoskedasticity &amp; outliers</li>
+<li>different error function</li>
+<li>cross-validation</li>
+</ul></li>
+<li>watch out for local optimas!
+
+<ul>
+<li>ABC optimisation</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Pricing</h2></hgroup><article  id="pricing">
+
+</article></slide><slide class=""><hgroup><h2>Type of product</h2></hgroup><article  id="type-of-product">
+
+<ul>
+<li>new products (price setting)
+
+<ul>
+<li>refer to any marketing introduction book
+
+<ul>
+<li>surveys, focus groups</li>
+<li>elasticity, competition prices, pricing objectives, &#8230;</li>
+</ul></li>
+<li>choosing a similar product as benchmark</li>
+</ul></li>
+<li>existing products (price corrections)
+
+<ul>
+<li>different products (manufacturers)
+
+<ul>
+<li>similar to new products</li>
+<li>benchmarking against similar products</li>
+</ul></li>
+<li>same products
+
+<ul>
+<li>main focus today</li>
+<li>enough data properly analyse</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Important concepts</h2></hgroup><article  id="important-concepts">
+
+<ul>
+<li>elasticity</li>
+<li>substitutes &amp; complements</li>
+<li>cross-elasticity</li>
+</ul>
+
+<p><font size="24" color="orange"> recall you microeconomics class </font></p>
+
+</article></slide><slide class=""><hgroup><h2>Log-log linear model &amp; elasticities</h2></hgroup><article  id="log-log-linear-model-elasticities">
+
+<p>from elasticity to log-log model</p>
+
+<p>\(E = \frac{\frac{\partial Q}{Q}}  {\frac{\partial P}{P}} =  \frac{\partial Q}{\partial P}\frac{P}{Q} \Rightarrow  \frac{\partial Q}{Q} = E\frac{\partial P}{P}\)<br/>\(\ln Q = E \ln P + c \Rightarrow \ln Q = \alpha + \beta \ln P\)</p>
+
+<p></br><br/>similarly for cross-elasticities</p>
+
+<p>\(ln Q = \alpha + \beta_{0} \ln P_{0} + \beta_{1} \ln P_{1} + \cdots + \beta_{n} \ln P_{n}\)<br/>- \(\beta_{j} &gt; 0 \Rightarrow\) substitutes, \(j &gt; 0\)<br/>- \(\beta_{j} &gt; 0 \Rightarrow\) complements, \(j &gt; 0\)</p></article></slide>
 
 
   <slide class="backdrop"></slide>

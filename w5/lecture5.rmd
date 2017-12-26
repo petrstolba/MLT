@@ -25,7 +25,8 @@ library(gganimate)
 
 ##  {.flexbox .vcenter}
 
-<font size="24" color="orange"> **You tell me...** </font>
+<font size="24" color="orange"> **You tell me...**  
+recall you statistics / econometrics class </font>
 
 ## Econometric approach
 OLS
@@ -59,6 +60,7 @@ $$\hat\beta = (X^{T}X)^{-1}X^{T}y$$
 >- 2 parameters, slope and a point
 >- there is only 1 parameter to estimate - why?
 >- $(\bar X,\bar Y)$
+>- optimisation task
 
 ## (i) random guess
 
@@ -90,9 +92,10 @@ gganimate(rndPlot)
 
 ## (ii) random guess + evolution
 
-- save the parameters and SSR of first iteration
+- save the parameters and SSR of first iteration - best estimation
 - if other parameters lead to lower SSR
-    - rewrite original
+    - rewrite the best estimation
+- new estimation close to the parameters of the best estimation 
 - <font color="orange">**very simple**</font> MCMC process
   
 ## (iii) random guess + evolution + reproduction
@@ -104,7 +107,7 @@ gganimate(rndPlot)
 3. let them breed
     - averaging, linear combinations
 4. find the best individuals of the extended population
-5. repeat 3. and 4. until convergence / other condition
+5. repeat 3. and 4. until convergence / stopping condition
 - simple evolution algorithm
 
 ## Evolution estimation
@@ -154,13 +157,64 @@ evoPlot <-
 gganimate(evoPlot)
 ```
 
-## (iv) gradient descend
+## (iv) gradient descent
 1. calculate the gradient of the function
     - $SSR = \sum_i (y_{i} - \hat y_{i})^{2} =
-    \sum_i (y_{i} - (b_{0} + b_{1}x_{i}))^{2} =$  
-    $\sum_i (y_{i} - (\hat y - b_{1} \hat x) - b_{1}x_{i})^{2} = \sum_i (y_{i} - \hat y - b_{1}(x_{i} - \hat x))^{2}$
-    - $\nabla SSR = \frac{\partial SSR}{\partial b_{1}} = H(b_{1})$
-2. generate initial random "estimate" of slope = $b$
+    \sum_i (y_{i} - (a + bx_{i}))^{2} =$  
+    $\sum_i (y_{i} - (\hat y - b \hat x) - bx_{i})^{2} = \sum_i (y_{i} - \hat y - b(x_{i} - \hat x))^{2}$
+    - $\nabla SSR = \frac{\partial SSR}{\partial b} = H(b)$
+2. generate initial random "estimate" of slope = $b_{0}$
 3. move a little in the direction of the gradient
-    - $b_{new} = b - \alpha H(b)$
-    - $\alpha$ = parameter
+    - $b_{n} = b_{n-1} - \alpha H(b)$
+    - $\alpha = parameter$
+4. repeat 3. until convergence / stopping condition
+
+## Differences
+- for the purpose of fitting the linear relationship (no inference)
+    - no assumptions
+- for inference (prediction)
+    - mostly care about homoskedasticity & outliers
+       - different error function
+    - cross-validation
+- watch out for local optimas!
+    - ABC optimisation
+
+# Pricing
+
+## Type of product
+- new products (price setting)
+    - refer to any marketing introduction book
+        - surveys, focus groups
+        - elasticity, competition prices, pricing objectives, ...
+    - choosing a similar product as benchmark
+- existing products (price corrections)
+    - different products (manufacturers)
+        - similar to new products
+        - benchmarking against similar products
+    - same products
+        - main focus today
+        - enough data properly analyse
+
+## Important concepts
+- elasticity
+- substitutes & complements
+   - cross-elasticity
+
+<font size="24" color="orange"> recall you microeconomics class </font>
+
+## Log-log linear model & elasticities
+
+from elasticity to log-log model  
+
+$E = \frac{\frac{\partial Q}{Q}}
+            {\frac{\partial P}{P}} =
+     \frac{\partial Q}{\partial P}\frac{P}{Q} \Rightarrow
+     \frac{\partial Q}{Q} = E\frac{\partial P}{P}$  
+$\ln Q = E \ln P + c \Rightarrow \ln Q = \alpha + \beta \ln P$  
+  
+</br>  
+similarly for cross-elasticities
+
+$ln Q = \alpha + \beta_{0} \ln P_{0} + \beta_{1} \ln P_{1} + \cdots + \beta_{n} \ln P_{n}$  
+- $\beta_{j} > 0 \Rightarrow$ substitutes, $j > 0$  
+- $\beta_{j} > 0 \Rightarrow$ complements, $j > 0$
