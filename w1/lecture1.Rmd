@@ -12,24 +12,30 @@ knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
 library(animation)
 library(magrittr)
 ```
+## Structure
+- Introduction & Course Overview
+- Project suggestions
+- ETL process
+
+
 # Introduction & Course Overview
 
 ## Lecturer
 - Michal Kubi&#353;ta
 - Main focus: European FMCG retail market
 - Contact: michal.kubista@nielsen.com
-- Office hours: Monday 18:00 - 19:00
+- Office hours: upon prior arrangment 
 - I'm bad with names ... *sorry*
 - <font color = "orange">**please include string "MDA2018" in your email subject** </font>
 
 <!-- TODO edit the office hours -->
 
 ## Organization
+- Monday: 16:15 - 19:30
+- Tuesday: 9:30 - 11:00
 - usual week: 2 lessons
 - additional lesson used to wrap up more complex topics (like this week)
     + otherwise can be used for consultations (pre-agreed via email)
-
-<!-- TODO add days -->
 
 ## Content
 - topics in marketing analysis
@@ -44,8 +50,8 @@ library(magrittr)
 ## Grading
 - project - *no worries in the exam period*
 - 4 deadlines
-    + getting the data (10 p)
-    + tidy up (20 p)
+    + project description (10 p)
+    + get and clean the data (20 p)
     + analyse (50 p)
     + present (20 p)
 
@@ -56,25 +62,26 @@ library(magrittr)
     + <font color= "orange"> at least 60 % at each deadline </font> 
 - submit via Github
 
-## Grading - data
-- quality
-    + should be discussed in advance
-- sufficiency
-    + "can the analysis be done with this data?"
+## Grading - project description
+- documentation
+- what will you analyse (churn, baskets, prices)
+    - what data will be used
+- why (predict churn, optimise prices)
+- how (logit, mixed-effects lm)
+- outcome discussion
+
+## Grading - data & tidiness
+- sufficiency = "can the analysis be done with this data?"
     + use <font color = "orange">**several sources**</font>
 - reproducibility
-    + try to get the data through R
-    + include all the sources (links)
-
-## Grading - tidiness
+    + try to get the data through R, or include all the sources (links)
 - [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf) - more on that in the second part
-- data already prepare for the algorithm run
 - <font color = "orange">**don't erase used commands & comment extensively**</font>
     + I want to see all the used commands (e.g. *summary*, *str*)
     + comment what is happening and how will you handle it
-    + it is part of the flow of the project
-    + helps me understand that you know what you are doing
+    + it is part of the flow of the project & it helps me understand that you know what you are doing
 - feature engineering and splitting can be done later
+- objective: data already prepare for the algorithm run
 
 ## Grading - analysis
 - usage of the model
@@ -86,8 +93,7 @@ library(magrittr)
 - <font color = "orange">**don't erase used commands & comment extensively**</font>
     + I want to see all the used commands
     + comment what is happening and how to handle it
-    + it is part of the flow of the project
-    + helps me understand that you know what you are doing
+    + it is part of the flow of the project & it helps me understand that you know what you are doing
 - model results interpretation
 
 ## Why commenting? {.flexbox .vcenter}
@@ -135,6 +141,32 @@ library(magrittr)
 
 <font size="24" color ="orange"> **Questions?** </font>  
 
+# Project suggestions
+
+## Sample projects
+- recommendation systems
+    - get the ratings and movie features
+    - data overview
+    - build several models (w3)
+    - combine predictions
+- basket analysis
+    - data overview
+        - enrich by weather data?
+    - product &| customer segmentation (w4)
+    - association rules (w2)
+    - personalised offers (w3)
+
+## Sample projects (ii)
+- pricing analysis
+    - data overview
+        - enrich by weather data?
+    - product segmentation (w4) / ranking (pareto)
+    - pricing strategy (w6)
+- customer loyalty / churn
+    - data overview
+    - (price and promotion) segmentation (w4)
+        - shopping missions
+    - churn analysis (w7)
 
 # ETL process
 

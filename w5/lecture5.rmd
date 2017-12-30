@@ -179,6 +179,8 @@ gganimate(evoPlot)
 - watch out for local optimas!
     - ABC optimisation
 
+<!-- ######################### SPLITTING HERE ######################### -->
+
 # Pricing
 
 ## Based on product type
