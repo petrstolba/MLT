@@ -10,7 +10,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
-                      cache = TRUE)
+                      cache = TRUE, fig.align='center',
+                      fig.width = 8, fig.height = 5)
 library(magrittr)
 library(ggplot2)
 library(gganimate)
@@ -179,3 +180,74 @@ gganimate(evoPlot)
     - ABC optimisation
     
 # PCA
+
+## Principal Component Analysis
+- data transformation method
+    - correlated variables into uncorrelated
+- useful for dimension reduction
+- produces new orthogonal "variables"
+    - linear combination of the original ones
+    
+>- similar to linear model (without the intercept)
+>- different error function
+
+<!-- DRAW PICTURE -->
+<!-- EIGEN RECAP -->
+## Components
+- basically the unit eigenvectors of covariance matrix
+- new "axes"
+- sorted according to amount of variance explained
+    - proportion of explained variance equals proportion of eigenvalues
+    - first component captures the highest amount of variance
+    - dimension reduction = choosing $k$ components
+
+## Calculating eigen-decomposition
+```{r cov_mat, echo = TRUE}
+(mtcars[,3:4] %>% scale %>% assign("scaled", ., pos = 1) %>% cov %T>% print %>%
+   eigen -> eg)
+```
+
+## Components
+```{r cov_plot, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+plot(scaled, asp = 1)
+abline(a = 0, b = 1, lty = 2)
+abline(a = 0, b = -1, lty = 2)
+lines(c(0,eg$vectors[1]),c(0,eg$vectors[2]), lwd = 2, col = "blue")
+lines(c(0,eg$vectors[3]),c(0,eg$vectors[4]), lwd = 2, col = "red")
+```
+
+## Reduced to 1D
+```{r eg_1, echo = TRUE, fig.align = 'left', fig.width = 9.5, fig.height = 5}
+{scaled %*% eg$vectors[,1]} %>% plot(ylab = "PC1")
+```
+
+## Compared with implemented function
+- stats::prcomp()
+    - using SVD, minor differences
+
+<div class="columns-2">
+```{r eg_compare}
+eg
+```
+
+```{r pca_compare}
+(prcomp(scaled) -> pca)
+```
+</div>
+
+## Plotting PCs
+```{r pc_plot}
+biplot(pca, cex = 0.5)
+```
+
+## Math behind - eigenvalue ~ explained variance
+$C = covariance \; matrix, n*m$  
+$w = vector, n*1, ||w|| = 1$ 
+$\lambda \in R$  
+
+Lagrange, maximise  
+$L = w^{T}Cw - \lambda(w^{T}w - 1)$  
+$\frac{\partial L}{\partial w} = 0 \Rightarrow Cw - \lambda w =0$  
+
+Substitute back
+$w^{T}Cw - \lambda(w^{T}w-1) = w^{T}Cw = \lambda w^{T} w = \lambda$
