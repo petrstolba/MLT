@@ -46,10 +46,10 @@ $$\hat\beta = (X^{T}X)^{-1}X^{T}y$$
 **n** observations, **k** variables (\* = OK for small **k**)
 
 - $X^T \; complextity \; O(nk)$ *
-- $X^{T}X = T_{k*k} \; complexity \; O(n^{2})$ <font color="red">**!**</font>
+- $X^{T}X = T_{k*k} \; complexity \; O(n^{2}k)$ <font color="red">**!**</font>
 - $T^{-1} = U_{k*k} \; complexity \; O(k^{3})$ *
-- $UX^{T} = V_{k*n} \; complexity \; O(k^{2}n)$ *
-- $Vy = W_{k*1} \; complexity \; O(kn)$ *
+- $UX^{T} = V_{k*n} \; complexity \; O(nk^{2})$ *
+- $Vy = W_{k*1} \; complexity \; O(nk)$ *
 
 >- what if **k** is not small?
 
@@ -161,7 +161,7 @@ gganimate(evoPlot)
 1. calculate the gradient of the function
     - $SSR = \sum_i (y_{i} - \hat y_{i})^{2} =
     \sum_i (y_{i} - (a + bx_{i}))^{2} =$  
-    $\sum_i (y_{i} - (\hat y - b \hat x) - bx_{i})^{2} = \sum_i (y_{i} - \hat y - b(x_{i} - \hat x))^{2}$
+    $\sum_i (y_{i} - (\overline y - b \overline x) - bx_{i})^{2} = \sum_i (y_{i} - \overline y - b(x_{i} - \overline x))^{2}$
     - $\frac{\nabla SSR}{n} = \frac{\partial SSR}{\partial b} * \frac{1}{n} = H(b)$
 2. generate initial random "estimate" of slope = $b_{0}$
 3. move a little in the direction of the gradient
@@ -187,12 +187,14 @@ gganimate(evoPlot)
 - useful for dimension reduction
 - produces new orthogonal "variables"
     - linear combination of the original ones
-    
+- how would you estimate that?
+
 >- similar to linear model (without the intercept)
 >- different error function
 
 <!-- DRAW PICTURE -->
 <!-- EIGEN RECAP -->
+
 ## Components
 - basically the unit eigenvectors of covariance matrix
 - new "axes"
@@ -207,8 +209,20 @@ gganimate(evoPlot)
    eigen -> eg)
 ```
 
+## Graphically
+```{r cov_plot1, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+plot(scaled, asp = 1)
+```
+
+## Eigenvectors
+```{r cov_plot2, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+plot(scaled, asp = 1)
+abline(a = 0, b = 1, lty = 2)
+abline(a = 0, b = -1, lty = 2)
+```
+
 ## Components
-```{r cov_plot, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+```{r cov_plot3, fig.align = 'left', fig.width = 10, fig.height = 5.8}
 plot(scaled, asp = 1)
 abline(a = 0, b = 1, lty = 2)
 abline(a = 0, b = -1, lty = 2)
