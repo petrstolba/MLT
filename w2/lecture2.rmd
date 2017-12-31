@@ -13,6 +13,11 @@ library(magrittr)
 library(ggplot2)
 ```
 
+## Structure
+1. NaiveBayes
+2. Association rules
+
+
 # Naive Bayes
 
 ## What is Naive Bayes?

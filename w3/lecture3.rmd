@@ -14,6 +14,11 @@ library(ggplot2)
 set.seed(123)
 ```
 
+## Structure
+1. Distance
+2. k-Nearest neighbourhood
+3. Recommendation system
+
 # Distance
 
 ##  {.flexbox .vcenter}
@@ -28,9 +33,9 @@ Manhattan
 D <- data.frame(a = c(1,2,2,3,3),
                 b = c(1,1,2,2,3))
 
-ggplot(D, aes(x = a, y = b))+
-      geom_line(color = "orange")+
-      coord_equal(ratio=1)+
+ggplot(D, aes(x = a, y = b)) +
+      geom_line(color = "orange") +
+      coord_equal(ratio = 1) +
       geom_point(data = D[c(1, nrow(D)),], size = 2, color = "orange")
 ```
 
@@ -46,10 +51,10 @@ D <- data.frame(a = seq(1,3, by = 0.1),
                 b = seq(1,3, by = 0.1))
 
 
-ggplot(D, aes(x = a, y = b))+
-      geom_line(color = "orange")+
-      geom_point(data = D[c(1,nrow(D)),], color = "orange")+
-      coord_equal(ratio=1)
+ggplot(D, aes(x = a, y = b)) +
+      geom_line(color = "orange") +
+      geom_point(data = D[c(1,nrow(D)),], color = "orange") +
+      coord_equal(ratio = 1)
       
 ```
 
@@ -66,7 +71,7 @@ $$H(x,y) = \sum_{i=1}^{n} 1_{x_{i} \ne y_{i}}$$
 
 $$G(x,y) = \frac{1}{n} \sum_{i=1}^{n} \frac{|x_{in} - x_{jn}|}{range(n)} $$
 
-# k - nearest neighbourhoods
+# k-Nearest neighbourhoods
 
 ## What does it do?
 
@@ -79,7 +84,7 @@ D <- data.frame(a,b,c)
 
 point <- data.frame(a = 2, b = 4, c = 0)
       
-ggplot(D, aes(x=a, y=b, color = as.factor(c))) +
+ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
       geom_point() +
       geom_point(data = point)
 
@@ -97,35 +102,43 @@ dist(D[,1:2]) %>%
       names %>%
       as.numeric() -> distInd
 
-ggplot(D, aes(x=a, y=b, color = as.factor(c))) +
+ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
       geom_point() +
       geom_point(data = point) +
-      geom_line(data = D[c(1,distInd[1]),], aes(x=a, y= b), inherit.aes = F, color = "gray45")
+      geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45")
 ```
 
 ## Two closest points?
 
 ```{r 2nn_fig}
 
-ggplot(D, aes(x=a, y=b, color = as.factor(c))) +
+ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
       geom_point() +
       geom_point(data = point) +
-      geom_line(data = D[c(1,distInd[1]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[2]),], aes(x=a, y= b), inherit.aes = F, color = "gray45")
+      geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45")
 ```
 
 ## K closest points?
 
 ```{r knn_fig}
 
-ggplot(D, aes(x=a, y=b, color = as.factor(c)))+ 
+ggplot(D, aes(x = a, y = b, color = as.factor(c))) + 
       geom_point() +
       geom_point(data = point) +
-      geom_line(data = D[c(1,distInd[1]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[2]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[3]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[4]),], aes(x=a, y= b), inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[5]),], aes(x=a, y= b), inherit.aes = F, color = "gray45")
+      geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[3]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[4]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45") +
+      geom_line(data = D[c(1,distInd[5]),], aes(x = a, y = b),
+                inherit.aes = F, color = "gray45")
       
 ```
 
@@ -144,7 +157,7 @@ D2 <- data.frame(a, b, c)
 point <- data.frame(a = 2.9, b = 5.8, c = 0)
 
 ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
-      geom_point()+
+      geom_point() +
       geom_point(data = point)
       
 ```
@@ -163,7 +176,7 @@ ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
 
 # Recommender Systems
 
-## Reccomendations?
+##  
 
 <img src="www/logo.jpg" width = "800">
 
@@ -209,9 +222,8 @@ ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
     + similar items
     + find similar items (often positively rated together)
     
-## Collaborative - how we do that?
-- co-occurence matrix
-
+## Collaborative - how do we do that?
+- incidence matrix 
 ```{r customer_history}
 M <-
       matrix(

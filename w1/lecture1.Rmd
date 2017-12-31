@@ -20,7 +20,7 @@ library(magrittr)
 
 # Introduction & Course Overview
 
-## Lecturer
+## About me
 - Michal Kubi&#353;ta
 - Main focus: European FMCG retail market
 - Contact: michal.kubista@nielsen.com
@@ -33,9 +33,8 @@ library(magrittr)
 ## Organization
 - Monday: 16:15 - 19:30
 - Tuesday: 9:30 - 11:00
-- usual week: 2 lessons
-- additional lesson used to wrap up more complex topics (like this week)
-    + otherwise can be used for consultations (pre-agreed via email)
+    - additional seminar used to wrap up more complex topics (like this week)
+    - otherwise can be used for consultations (pre-agreed via email)
 
 ## Content
 - topics in marketing analysis
@@ -110,7 +109,7 @@ library(magrittr)
 
 ## Bonus points
 - occasional option to get some
-- play a game, prove some theory, calculate, suggest approach
+- play a game, prove some theory, calculate, suggest an approach
 - in a form of home assignments
 - achieving more than 100% score results in some sweet reward
 
@@ -131,7 +130,7 @@ library(magrittr)
 - download the slides (sources)
 - should you find any mistake in the materials
     + suggest edit via pull request
-- submit parts of the project via pull requests to your branch
+- submit parts of the project via pull requests to your repo
     + submitting sooner means more time to discuss before the deadline
 
 <!-- TODO setup project structure and branches -->
@@ -211,10 +210,11 @@ read.table("data/lecture/load_error2.csv", fill = FALSE, skip = 1, nrows = 2)
 
 <img src="www/load_error3.png">
 <img src="www/load_error3_2.png">  
+<!-- add picture -->
 
 ## Encoding solution
 ```{r, echo = TRUE}
-read.table("data/lecture/load_error3.csv", encoding = "UTF-8", stringsAsFactors = FALSE)
+read.table("data/lecture/load_error3.csv", encoding = "UTF-8", stringsAsFactors = FALSE) %>% View()
 ```
 
 > - more on encoding [here](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/) & [here](http://kunststube.net/encoding/)
