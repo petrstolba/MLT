@@ -114,7 +114,7 @@ library(magrittr)
     + play the game **CastleOfR** (originally written by [Giora Simchoni](https://github.com/gsimchoni/CastleOfR))
     + *what do the dragons like?*
     + email me the answer and get the points
-    + 2 % up for the final grade
+    + 2p up for the final grade
 
 
 ## Github
@@ -124,7 +124,8 @@ library(magrittr)
 - download the slides (sources)
 - should you find any mistke in the materials
     + suggest edit via pull request
-- submit parts of the project via pull requests to your repo
+- submit done via [Github classroom](https://classroom.github.com/a/KtcVpIMo)
+
     + submitting sooner means more time to discuss before the deadline
 
 ##  {.flexbox .vcenter}

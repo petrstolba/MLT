@@ -4,7 +4,9 @@
 ## 8 January 2018 ##
 ####################
 
-lapply(c("data.table","dplyr","magrittr","ggplot2"), require, character.only = T)
+sapply(c("data.table","dplyr","magrittr","ggplot2"),
+       require,
+       character.only = T)
 path2data <- "w1/data/seminar"
 
 if (!dir.exists(path2data)) {
@@ -13,57 +15,62 @@ if (!dir.exists(path2data)) {
 
 #-- PART 1 - LOADING TIPS & TRICKS ############################################
 
+## download data @ https://drive.google.com/drive/folders/1RYDFVr3kZhss2HMaa4_87kKSQ2_TbJsU?usp=sharing
+
 #--- 1.1 SEVERAL SIMILAR FILES ------------------------------------------------
 
 ## data origin https://www.kaggle.com/onlineauctions/online-auctions-dataset
 ## script used to create our data:
-auction <- data.table::fread(file.path(path2data,"auction.csv"), dec = ".",
-data.table = F)
-str(auction)
-
-auction[,c("bid", "bidtime", "bidderrate", "openbid", "price")]  %<>%
-      apply(., 2, as.numeric)
-str(auction)
-
-data.table::fwrite(auction, file.path(path2data,"auction.csv"))
-
-auction %<>% dplyr::mutate(days = ceiling(bidtime))
-
-g_write <- function(x){
-      write.csv(x,file.path(path2data,
-                          paste0("auction_day_",unique(x$days),".csv")),
-                row.names = F)
-      return(x)
-}
-
-auction %>%
-      group_by(days) %>%
-      do(g_write(.))
-
-rm(auction)
+# auction <- data.table::fread(file.path(path2data,"auction.csv"), dec = ".",
+# data.table = F)
+# str(auction)
+# 
+# auction[,c("bid", "bidtime", "bidderrate", "openbid", "price")]  %<>%
+#       apply(., 2, as.numeric)
+# str(auction)
+# 
+# data.table::fwrite(auction, file.path(path2data,"auction.csv"))
+# 
+# auction %<>% dplyr::mutate(days = ceiling(bidtime))
+# 
+# g_write <- function(x){
+#       write.csv(x,file.path(path2data,
+#                           paste0("auction_day_",unique(x$days),".csv")),
+#                 row.names = F)
+#       return(x)
+# }
+# 
+# auction %>%
+#       group_by(days) %>%
+#       do(g_write(.))
+# 
+# rm(auction, g_write)
 #----
 
-file_Names <- function(){
-      files <- list.files(path2data, full.names =  T)[-1]
-      files[-grep("upc",files)]
+auction_Names <- function(){
+      files <- list.files(path2data, full.names =  T)
+      files <- files[grep("auction_day",files)]
+      return(files)
 
 }
 
 #---- 1.1.1 FOR LOOP ----------------------------------------------------------
+auction_Names()
 
 input <- list()
 
-for(i in file_Names()){
-      input[[length(input)+1]] <- read.csv(i)
+for (i in auction_Names()) {
+      input[[length(input) + 1]] <- read.csv(i)
 }
 
-inputTable <- do.call(rbind.data.frame,input)
+sapply(input, colnames)
+inputTable <- do.call(rbind.data.frame, input)
 
 rm(input, inputTable, i)
 
 #---- 1.1.2. APPLY ------------------------------------------------------------
 
-input <- lapply(file_Names(), read.csv)
+input <- lapply(auction_Names(), read.csv)
 
 inputTable <- do.call(rbind.data.frame,input)
 
@@ -71,66 +78,69 @@ rm(input, inputTable)
 
 #---- 1.1.3. DATA.TABLE -------------------------------------------------------
 
-dtNames <- data.table::data.table(file = file_Names())
-dtTable <- dtNames
+dtNames <- data.table::data.table(file = auction_Names())
+dtTable <- dtNames[,fread(file), by = file]
 
 ## shorter version
-dtTable <- data.table::data.table(file = file_Names())[,fread(file), by = file]
+dtTable <- 
+    data.table::data.table(file = auction_Names())[,fread(file), by = file]
 
-rm(dtNames, dtTable)
+rm(dtNames, dtTable, auction_Names)
 
 #--- 1.2 SEVERAL DIFFERENT (CONNECTED) FILES ----------------------------------
-
 ## script used to create our data:
 # auction <- fread(file.path(path2data,"auction.csv"), dec = ".", data.table = F) %>%
 #       mutate(ID = paste0(auctionid,bidtime,bidder))
-#
+# 
 # apply(auction, 2, function(x) length(unique(x)))
-#
+# 
 # auction %>% select(ID, item, auction_type) -> itemTable
 # auction %>% select(ID, price) -> priceTable
 # auction %>% select(-c(item, auction_type, price)) -> auctionTable
-#
+# 
 # dtOut <- data.table(file = c("itemTable","priceTable", "auctionTable"))
 # dtOut[,fwrite(get(file),file.path(path2data,paste0(file,".csv"))),
 #       by = file
 #       ]
-#
+# 
 # rm(auction, auctionTable, priceTable, itemTable, dtOut)
-#---
+#----
 
-file_Names() %>% grep("Table",.) %>% file_Names()[.] -> inFileNames
+(list.files(path2data) %>%
+     grep("Table",.) %>%
+     list.files(path2data, full.names = TRUE)[.] -> inFileNames)
 
 #---- 1.2.1 DATA.TABLE JOIN --------------------------------------------------
 
 input <- lapply(inFileNames, fread)
 names(input) <- inFileNames %>% gsub(".*/","",.) %>% gsub(".csv","",.)
 
-dtTable <- input$auctionTable[input$itemTable,on = "ID"][input$priceTable, on = "ID"]
+dtTable <- input$auctionTable[input$itemTable, on = "ID"
+                            ][input$priceTable, on = "ID"]
 
 rm(dtTable)
 
 #---- 1.2.2 (D)PLYR JOIN ----------------------------------------------------
 
-dplyr::full_join(input$auctionTable,input$itemTable) %>%
+dplyr::full_join(input$auctionTable, input$itemTable, by = "ID") %>%
       full_join(input$priceTable) -> inputTable
 
 inputTable2 <- plyr::join_all(input)
 
-rm(input, inputTable, inputTable2)
+rm(input, inputTable, inputTable2, inFileNames)
 
 #--- 1.3 READING WITH COL.CLASSES ---------------------------------------------
 
 ## data origin: https://www.kaggle.com/rtatman/universal-product-code-database/data
 ## script used to create our data:
 # upc <- data.table::fread(file.path(path2data,"upc_corpus.csv"))
-#
+# 
 # upc$ean %>% as.numeric() %>% is.na() -> numIndex
 # upc$ean[numIndex] <- "0"
-#
+# 
 # upcLength <- nchar(upc$ean)
 # maxLength <- max(upcLength)
-#
+# 
 # # system.time({
 # #       for(i in seq_along(upc$ean)){
 # #             upc$ean[i] <-
@@ -144,18 +154,21 @@ rm(input, inputTable, inputTable2)
 # #
 # #       }
 # # })
-#
+# 
 # library(stringr)
 # library(purrr)
-#
+# 
 # system.time({
-#      upc$ean <- purrr::map2_chr(upc$ean, upcLength,
-#                                  function(x,y) paste0(stringr::str_dup("0", maxLength - y),x)
-#                                  )
+#      upc$ean <-
+#          purrr::map2_chr(upc$ean, upcLength,
+#                          function(x,y) paste0(
+#                              stringr::str_dup("0", maxLength - y
+#                                               ),x)
+#          )
 # })
-#
+# 
 # data.table::fwrite(upc, file.path(path2data, "upc.csv"))
-#
+# 
 # rm(upc, upcLength, maxLength, numIndex)
 #----
 
@@ -164,18 +177,22 @@ upc <- data.table::fread(file.path(path2data, "upc.csv"))
 upc %>% head(1000) %>% View()
 upc[9740:9744,]
 
-upc <- data.table::fread(file.path(path2data, "upc.csv"), colClasses = c("character", "character"))
+upc <- data.table::fread(file.path(path2data, "upc.csv"),
+                         colClasses = c("character", "character"))
 upc %>% head(1000) %>% View()
+
 ## or in case of large amount of columns
 upc <- data.table::fread(file.path(path2data, "upc.csv"),
              colClasses = c(ean = "character"))
+
 upc %>% head(1000) %>% View()
+rm(upc)
 
 #-- PART 2 - CLEANING TIPS & TRICKS ###########################################
 
 #--- 2.1 REGEX ----------------------------------------------------------------
 #---- 2.1.1 TO BE, OR NOT TO BE
-hamlet <- readLines("http://www.gutenberg.org/cache/epub/1524/pg1524.txt")
+hamlet <- readLines("http://www.gutenberg.org/files/1524/1524-0.txt")
 hamlet[1:50]
 
 grep("hamlet.*prince.*denmark", hamlet[1:500], ignore.case = TRUE)
@@ -188,39 +205,44 @@ hamText <- hamlet[31:length(hamlet)]
 hamHead <- hamlet[1:30]
 rm(hamlet)
 
-sum(grepl("rosencrantz",hamText, ignore.case = TRUE))
-length(grep("rosencrantz",hamText, ignore.case = TRUE))
+sum(grepl("rosencrantz", hamText, ignore.case = TRUE))
+length(grep("rosencrantz", hamText, ignore.case = TRUE))
 
 
-function(name){
-      a <- length(grep(name, hamText, ignore.case = TRUE))
-      root <- stringr::str_sub(name,1,nchar(name)-3)
-      b <- length(grep(root,hamText, ignore.case = TRUE))
+finder <- function(name){
+    a <- length(grep(name, hamText, ignore.case = TRUE))
+    root <- stringr::str_sub(name,1,nchar(name) - 3)
+    b <- length(grep(root,hamText, ignore.case = TRUE))
+    return(c(a,b))
 }
-## WHAT WILL THIS DO?
 
-## TODO add apply over hamText & hamPersons
+finder("hamlet")
+finder("claudius")
 
+rm(hamText, hamHead, finder)
 
 #---- 2.1.2 DATA & REGEX
 ## data origin: https://www.datazar.com/project/p9d520430-ab0a-4f26-a44a-39b08d0e41bb/overview
 
-broadband <-
-      data.table::fread(
-            file.path(path2data,"broadbands.csv"),
-            sep = ";", data.table = FALSE
-      )
+unzip(
+    file.path(path2data,
+              "fixed-broadband-speeds-postcode-london-2016.xlsx.zip"),
+    exdir = path2data
+    )
+
+broadband <- 
+    readxl::read_excel(
+        file.path(path2data,"fixed-broadband-speeds-postcode-london-2016.xlsx")
+    )
+
 str(broadband)
-
-## TODO wtf long??
-
-colnames(broadband) %>% stringr::str_detect("V[0-9]{2}") -> colIndex
-broadband <- broadband[,!colIndex]
 
 broadband <- broadband[,c(1,8:11,16:19,35,36)]
 colnames(broadband) <-
       c("place", "downAvg", "downMed", "downMin", "downMax", "upAvg", "upMed",
         "upMin","upMax", "lat","lon")
+
+summary(broadband)
 
 broadband$downAvg %>%
       stringr::str_replace("[0-9]*","") %>%
@@ -235,12 +257,12 @@ removeStuff <- function(x){
 
 broadband[,-1] <- apply(broadband[,-1], 2, removeStuff)
 
+summary(broadband)
+
 #--- 2.2 MANIPULATION ---------------------------------------------------------
 #---- 2.2.1 DPLYR -------------------------------------------------------------
 
 broadband %>% dplyr::filter(lon > 0, lat > 51.6)
-
-broadband %>% dplyr::select(lon, lat) %>% 
       
 broadband %>%
       dplyr::select(lon, lat) %>% 
@@ -269,32 +291,34 @@ data.table::as.data.table(broadband)[
                meanDif = meanMax - meanMin)][
                      order(-meanDif)
                ]
-
 #--- 2.3 LONG-WIDE -----------------------------------------------------------
 
 broadbandLong <- tidyr::gather(broadband[,1:5], key = "metric", value = "measure", downAvg:downMax)
 
 broadbandWide <- tidyr::spread(broadbandLong, metric, measure)
 
+rm(broadband, broadbandWide, broadbandLong, removeStuff)
+
 #-- PART 3 - EXPLORING TIPS & TRICKS ##########################################
 
-auction <- data.table::fread(file.path(path2data,"auction.csv"), dec = ".", data.table = F)
+auction <- data.table::fread(file.path(path2data,"auction.csv"),
+                             dec = ".", data.table = F)
 
 #--- 3.1 BASE R
 
-colSelect <- !colnames(auction) %in% c("auctionid","bidder","item","auction_type")
+colSelect <-
+    !colnames(auction) %in% c("auctionid","bidder","item","auction_type")
 plot(auction[,colSelect])
 
 #--- 3.2 GGally
 
-colSelect <- !colnames(auction) %in% c("auctionid","bidder","item")
 GGally::ggpairs(auction[,colSelect])
 
 #--- 3.3 ORLY?
-adress <-
+url <-
       "http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/orly_owl_files/orly_owl_Lin_4p_5_flat.txt"
 
-orly <- read.table(adress, header = FALSE)
+orly <- read.table(url, header = FALSE)
 
 fit <- lm(V1 ~ . - 1, data = orly)
 
