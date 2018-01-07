@@ -1,0 +1,156 @@
+---
+title: "Lecture 2"
+author: "Michal Kubi&#353;ta"
+date: "15 January 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
+library(magrittr)
+library(ggplot2)
+```
+
+## Structure
+1. NaiveBayes
+2. Association rules
+
+
+# Naive Bayes
+
+## What is Naive Bayes?
+- simple machine learning algorithm
+- classification, labelling
+- based on tables
+- works on basis of conditional probability
+    + what is the probability of event X given event Y
+    + what is the probability of customer churn, given his recent shopping history
+    + what is the probability of item being labeled as "soft drink", given it's producer is "Kofola"
+
+## Why Bayes?
+Bayes Theorem:
+$$P(X|Y) = \frac{P(Y|X)*P(X)}{P(Y)}$$
+Y - item producer - "Kofola"  
+X - item category - "soft drinks"  
+  
+P(X|Y) = probability of item being "soft drink" given it's producer is  "Kofola"  
+P(Y|X) = proportion of item produced by "Kofola" in category "soft drink"  
+P(X)   = proportion of "soft drink" items among all items  
+P(Y)   = proportion of items produced by "Kofola" among all items  
+
+## Simple example
+<img src= "www/kofola.jpg" align="right" width="100">
+100 items  
+20 soft drinks  
+5 Kofola - 4 in soft drinks, 1 not
+  
+P(soft|Kofola) = 0.8  
+P(Kofola|soft) = 0.2  
+P(soft) = 0.2  
+P(Kofola) = 0.05  
+
+## Why Naive?
+more variables? => chain rule!
+$$P(X|Y_{1}=y_{1},Y_{2}=y_{2},...,Y_{n}=y_{n}) = $$
+$$\frac{P(Y_{1}=y_{1} \cap Y_{2}=y_{2} \cap ... \cap Y_{n}=y_{n} |X)*P(X)}{P(Y)}$$
+<font color = "orange">**hard or heavy!**</font>
+
+## Why Naive? (ii)
+assumption: independence of events!
+$$P(X|Y_{1}=y_{1},Y_{2}=y_{2},...,Y_{n}=y_{n}) = $$
+$$\frac{P(Y_{1}=y_{1}|X) * P(Y_{2}=y_{2}|X) * ... * P(Y_{n}=y_{n}|X)*P(X)}{P(Y)}$$
+
+## Other issues
+- Laplace  estimator
+    + ussually 1 (= counts)
+- discrete values
+
+
+## Conclusion
+- classic implementation e1071::naiveBayes
+- very simple
+- can perform surprisingly good
+- easily saturable
+- used for
+    + recommendation system
+    + sentiment analysis
+    + labelling
+    + classification (churn)
+
+# Association rules
+
+## Association mining
+- study of how situations happen together
+    + no independence of events!
+- basket analysis
+    + transaction (t-log) or loyalty data
+    + how often are items bought together
+- clustering?
+- apriori algorithm
+
+    >- find frequent itemsets
+    >- identify strong rules
+
+## Itemsets & rules
+- itemset
+    + set of items
+    + {butter, cheese, bread}
+- rule
+    + if &#x2192; then
+    + {butter, cheese} &#x2192; {bread}
+
+## Frequent itemsets (i) 
+- for **k** items there is **2<sup>k</sup> - 1** itemsets
+- how to find only the important ones?
+- apriori assumption
+    + itemsets can be frequent only if all their subsets are frequent
+    + *{bread, butter, milk}* chosen only if *{bread, butter}*, *{bread, milk}*,  
+    *{butter, milk}* chosen in previous step
+
+## Frequent itemsets (ii) - joins & pruning
+- joins: construct larger itemsets using smaller ones
+    + *{1,2}*, *{1,3}*, *{3,4}* are joined to *{1,2,3}*, *{1,3,4}*
+- pruning: support and apriori
+    + support: how often does the itemset occur (parameter)
+    
+    $$sup(X) = \frac{count(X)}{N} $$
+    + apriori: neither *{1,2,3}* nor *{1,3,4}* chosen (why?)
+        
+        >- how about *{2,3}* or *{1,4}*
+
+## Strong rules
+- confidence and lift metrics
+- confidence:
+$$conf(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp (X)} $$
+- lift:
+$$lift(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp(X) * supp (Y)} $$
+
+## Confidence and Lift
+- confidence expresses conditional probability
+    + transaction contains milk (given), how likely is it to contain bread?
+- lift expresses how much likely the situation is to happen
+    + compared to independent events
+        + **P(A) * P(B)**
+    
+$$conf(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp (X)} $$
+$$lift(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp(X) * supp (Y)} $$
+
+## Apriori summary
+- find frequent itemsets
+    + from size 1 to k:
+        + join previously chosen sets (size k-1) generating sets of size k
+        + check apriori condition
+        + if no set remains, stop
+        + find sets that meet the support parameter
+- find strong rules
+    + based on the confidence parameter
+    
+## Conclusion
+- suited to work with large amounts of data
+- interpretability
+- separating insight from common sense
+    + actionable | trivial | inexplicable rules
+- not robust against random patterns
+- DNA sequencing

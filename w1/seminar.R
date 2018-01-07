@@ -1,11 +1,15 @@
 ####################
 ## Seminar 1      ##
 ## Michal Kubista ##
-## 3 January 2017 ##
+## 8 January 2018 ##
 ####################
 
 lapply(c("data.table","dplyr","magrittr","ggplot2"), require, character.only = T)
 path2data <- "w1/data/seminar"
+
+if (!dir.exists(path2data)) {
+    dir.create(path2data, recursive = T)
+}
 
 #-- PART 1 - LOADING TIPS & TRICKS ############################################
 
@@ -13,30 +17,30 @@ path2data <- "w1/data/seminar"
 
 ## data origin https://www.kaggle.com/onlineauctions/online-auctions-dataset
 ## script used to create our data:
-# auction <- data.table::fread(file.path(path2data,"auction.csv"), dec = ".",
-                              # data.table = F)
-# str(auction)
-#
-# auction[,c("bid", "bidtime", "bidderrate", "openbid", "price")]  %<>%
-#       apply(., 2, as.numeric)
-# str(auction)
-#
-# data.table::fwrite(auction, file.path(path2data,"auction.csv"))
-#
-# auction %<>% dplyr::mutate(days = ceiling(bidtime))
-#
-# g_write <- function(x){
-#       write.csv(x,file.path(path2data,
-#                           paste0("auction_day_",unique(x$days),".csv")),
-#                 row.names = F)
-#       return(x)
-# }
-#
-# auction %>%
-#       group_by(days) %>%
-#       do(g_write(.))
-#
-# rm(auction)
+auction <- data.table::fread(file.path(path2data,"auction.csv"), dec = ".",
+data.table = F)
+str(auction)
+
+auction[,c("bid", "bidtime", "bidderrate", "openbid", "price")]  %<>%
+      apply(., 2, as.numeric)
+str(auction)
+
+data.table::fwrite(auction, file.path(path2data,"auction.csv"))
+
+auction %<>% dplyr::mutate(days = ceiling(bidtime))
+
+g_write <- function(x){
+      write.csv(x,file.path(path2data,
+                          paste0("auction_day_",unique(x$days),".csv")),
+                row.names = F)
+      return(x)
+}
+
+auction %>%
+      group_by(days) %>%
+      do(g_write(.))
+
+rm(auction)
 #----
 
 file_Names <- function(){
