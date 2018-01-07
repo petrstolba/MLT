@@ -39,7 +39,7 @@ library(magrittr)
     + customer segmentation
     + pricing strategies
 - algorithms 
-    + distance based techniques
+    + distance-based techniques
     + CART type algorithms
     + neural networks
 - ETL process !!!
@@ -179,7 +179,7 @@ for(i in 1:nrow(mtcars)){
 
 ## What now?
 - data can't be read into R 
-- no metadata avaliable
+- no metadata available
 - file too large to be opened in common tools (notepad, excel)
 
 <img src="www/load_error.png">
