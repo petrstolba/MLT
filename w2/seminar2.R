@@ -4,24 +4,47 @@
 ## 15 January 2018 ##
 #####################
 
-lapply(
+install_and_load <- function(name, char = T){
+    if(!require(name, character.only = char)){
+        install.packages(name)
+    }
+    require(name, character.only = char)
+}
+
+sapply(
       c("data.table","tidyverse","magrittr",
         "arules","arulesViz","readxl"),
-      require,
-      character.only = T
+      install_and_load
       )
 #-- PART 1 - NAIVE BAYES #######################################################
 
 #--- 1.1 ETL -------------------------------------------------------------------
 prodTab <- fread("w2/data/prod_structure.csv")
 
-## overview
+## The first data overview
 str(prodTab)
-# View(prodTab)
+    # everything looks fine, 2 character columns as expected.
+    # since the size is manageable, we can view the whole table.
+View(prodTab)
+    # no surprises
+
+## Check the proportion of the categories and products
 table(prodTab$category_name)
 map(prodTab, ~length(unique(.)))
+    # there is a strong inbalance, especially with
+    # Mineral waters = 315 products
+    # Juice =          446 products
+    # Tonic =            9 products.
+    # overall, we have 8 categories and 843 products.
+    # since there are 1039 rows, there will be some duplicites
+    # since this is only a slice of the original data
+    # we will not manage the duplicities to keep the the original
+    # proportions
 
-
+# Define the injection function
+    # to increase the number of variables to better feed our Bayes
+    # classifier, we will split the product_names into three different
+    # description columns
 inject <- function(x){
       x %<>%
             strsplit(split = " ") %>% 
@@ -29,17 +52,28 @@ inject <- function(x){
 }
 
 ## splitting the product names
+    # now let's apply the user-defined function over the rows of the table,
+    # creating a new table and add the column names
 newCols <- apply(prodTab[,2], 1 ,inject) %>%
       do.call(rbind.data.frame,.)
 colnames(newCols) <- c("desc1","desc2","desc3")
 
 ## binding together, all factors!
+    # now we will bind the original table with the new columns
+    # and change the column clases into factors
+    # as Bayes is not able to work with text data
 prodTab <- cbind(prodTab,newCols)
 prodTab <- apply(prodTab,2,as.factor) %>% as.data.frame()
 
+    # let's check the unique values in all columns
+    # we have most of the unique descriptions in the second and third column
 map(prodTab, ~length(unique(.)))
 
+
 ## train & test division
+    # because of the random splitting, we are setting the seed to ensure
+    # the reproducibilty, we split the data in half into the train and
+    # test data
 set.seed(123)
 nrow(prodTab) %>% {sample(.,. * 0.50)} -> index
 train <- prodTab[index,]
@@ -58,10 +92,22 @@ bayes <- naiveBayes(category_name ~ ., train)
 test$lab <- predict(bayes, test)
 
 ## changin the columns
+    # changing the column order for the purpose ofo interpratation and
+    # model performance assessment, putting the original and predicted
+    # labels next to each other
+    # the accuracy looks very well on the first peak
 test <- test[,c(1,6,2:5)]
+View(test)
 test$ok <- test$category_name == test$lab
 
 ## accuracy statistics
+    # defining the accuracy statistics:
+    # overall accuracy = the overall accuracy is very good, 93,1 %
+    # confusion table = we see no large problems in the model
+    #                   there is no label that would be systematically
+    #                   mispredicted; the categories with higher amount of
+    #                   observations have higher number of bad predictions,
+    #                   but there is no surprise in that either 
 sum(test$ok)/nrow(test) * 100
 table(test$category_name, test$lab)
 
