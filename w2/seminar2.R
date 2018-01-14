@@ -3,12 +3,11 @@
 ## Michal Kubista  ##
 ## 15 January 2018 ##
 #####################
-
 install_and_load <- function(name, char = T){
-    if(!require(name, character.only = char)){
+    if (!require(name, character.only = char)) {
         install.packages(name)
     }
-    require(name, character.only = char)
+        require(name, character.only = char)
 }
 
 sapply(
@@ -16,9 +15,20 @@ sapply(
         "arules","arulesViz","readxl"),
       install_and_load
       )
+
+rm(install_and_load)
+
+if (!dir.exists("w2/data")) {
+    dir.create("w2/data", recursive = T)
+}
+
 #-- PART 1 - NAIVE BAYES #######################################################
 
 #--- 1.1 ETL -------------------------------------------------------------------
+# download data from 
+# https://drive.google.com/file/d/18QC-ZjT3pUTFWNgAl8G4VZgDA-DQkNni/view?usp=sharing
+# into w2/data
+
 prodTab <- fread("w2/data/prod_structure.csv")
 
 ## The first data overview
@@ -31,9 +41,9 @@ View(prodTab)
 ## Check the proportion of the categories and products
 table(prodTab$category_name)
 map(prodTab, ~length(unique(.)))
-    # there is a strong inbalance, especially with
-    # Mineral waters = 315 products
-    # Juice =          446 products
+    # there is a strong class inbalance, especially with
+    # Mineral waters = 315 products AND
+    # Juice =          446 products VERSUS
     # Tonic =            9 products.
     # overall, we have 8 categories and 843 products.
     # since there are 1039 rows, there will be some duplicites
@@ -77,11 +87,11 @@ map(prodTab, ~length(unique(.)))
 set.seed(123)
 nrow(prodTab) %>% {sample(.,. * 0.50)} -> index
 train <- prodTab[index,]
-test <-prodTab[-index,]
+test <- prodTab[-index,]
 rm(newCols, index)
 
 #--- 1.2 LABELLING -------------------------------------------------------------
-if(!require("e1071")){
+if (!require("e1071")) {
       install.packages("e1071")
 }
 
@@ -124,33 +134,34 @@ transRaw <- read.delim("w2/data/retail.dat.gz",
 
 colnames(transRaw) <- "items"
 
+transRaw %>% head(500) %>% View()
+
 ## find unique items
 strsplit(transRaw$items, split = " ") %>% 
       unlist() -> items
 itemsUn <- unique(items)
 
 ## this will not work :/
-mat <- matrix(0,nrow(transRaw),length(itemsUn))
+mat <- matrix(0, nrow(transRaw), length(itemsUn))
 
 ## item frequencies
-table(items) %>%
+table(items) %>% 
       as.data.frame() %>% 
       arrange(desc(Freq)) -> itemsFreq
 
 summary(itemsFreq$Freq)
 
-nrow(transRaw)/100
+sum(itemsFreq$Freq > 100)
 
 itemsFreq %>% 
       filter(Freq > 100) %>%
       .$items -> itemsCh
 
 ##____Since we will limit the support of the rules later in the training phase,
-##____we can already omit some items. By omitting, I mean, not including them
+##____we can already omit some items. By omitting I mean excluding them
 ##____as variables, not removing them from transactions (or even removing the
 ##____transactions). 
 rm(items, itemsUn, itemsFreq)
-
 
 inject <- function(raw){
       raw %>%
@@ -174,12 +185,12 @@ inject <- function(raw){
 #                   unlist() -> non_list
 #             index <- itemsCh %in% non_list %>% which()
 #             transMat2[i,index] <- 1
-#             
+# 
 #             print(paste(round(i/nrow(transRaw)*100,3),"%"))
 #             flush.console()
 #       }
 # })
-# rm(transMat2, i , index, non_list, timeFor, timeApply)
+# rm(transMat2, i , index, non_list, timeFor, tkubimiimeApply)
 # ----
 
 system.time({transMat <- t(sapply(transRaw$items, inject))})
@@ -249,13 +260,14 @@ colnames(transMat) <- transTable$InvoiceNo
 ##--- 2.2.2 ASSOCIATIONS -------------------------------------------------------
 model <- apriori(transMat, parameter = list(support = 0.02, confidence = 0.25))
 
-model %>% inspect() %>% as.data.frame() -> test
-rm(test)
+model %>% inspect() %>% as.data.frame()
 
 ## extract data manually
 rules <- cbind(labels = labels(model), model@quality)
+    # "@" because S4 happened
+
 rules$lhs <- gsub("=>.*","", rules$labels)
 rules$rhs <- gsub(".*=>","", rules$labels)
 
 rules <- rules[,c("lhs","rhs","support","confidence","lift", "count")]
-#View(rules)
+View(rules)
