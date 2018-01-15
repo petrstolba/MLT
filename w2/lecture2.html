@@ -160,15 +160,17 @@ P(Kofola|soft) = 0.2<br/>P(soft) = 0.2<br/>P(Kofola) = 0.05<br/>
 
 </article></slide><slide class=""><hgroup><h2>Why Naive?</h2></hgroup><article  id="why-naive">
 
-<p>more variables? =&gt; chain rule! \[P(X|Y_{1}=y_{1},Y_{2}=y_{2},...,Y_{n}=y_{n}) = \] \[\frac{P(Y_{1}=y_{1} \cap Y_{2}=y_{2} \cap ... \cap Y_{n}=y_{n} |X)*P(X)}{P(Y)}\] <font color = "orange"><strong>hard or heavy!</strong></font> <!-- k variables with total of 6k levels and C classes:
+<p>more variables? =&gt; chain rule! \[P(X|Y_{1}=y_{1},Y_{2}=y_{2},...,Y_{n}=y_{n}) = \] \[\frac{P(Y_{1}=y_{1} \cap Y_{2}=y_{2} \cap ... \cap Y_{n}=y_{n} |X)*P(X)}{P(Y)}\] <font color = "orange"><strong>hard or heavy!</strong></font></p>
+
+<!-- k variables with total of 6k levels and C classes:
      C * 6^k values in table 
      10 manufacturers, 30 brands, 4 sizes, 40 flavours,
      3 package types, 5 sugar content categories +
      8 classes =>
      8*10*30*4*30*3*5 = 4 320 000 possible combinations!
-     --></p>
+     -->
 
-  </article></slide><slide class=""><hgroup><h2>Why Naive? (ii)</h2></hgroup><article  id="why-naive-ii">
+</article></slide><slide class=""><hgroup><h2>Why Naive? (ii)</h2></hgroup><article  id="why-naive-ii">
 
 <p>assumption: independence of events! \[P(X|Y_{1}=y_{1},Y_{2}=y_{2},...,Y_{n}=y_{n}) = \] \[\frac{P(Y_{1}=y_{1}|X) * P(Y_{2}=y_{2}|X) * ... * P(Y_{n}=y_{n}|X)*P(X)}{P(Y)}\]</p>
 
