@@ -3,6 +3,7 @@
 ## Michal Kubista  ##
 ## 15 January 2018 ##
 #####################
+
 install_and_load <- function(name, char = T){
     if (!require(name, character.only = char)) {
         install.packages(name)
@@ -55,6 +56,7 @@ map(prodTab, ~length(unique(.)))
     # to increase the number of variables to better feed our Bayes
     # classifier, we will split the product_names into three different
     # description columns
+
 inject <- function(x){
       x %<>%
             strsplit(split = " ") %>% 
@@ -185,12 +187,12 @@ inject <- function(raw){
 #                   unlist() -> non_list
 #             index <- itemsCh %in% non_list %>% which()
 #             transMat2[i,index] <- 1
-# 
+#
 #             print(paste(round(i/nrow(transRaw)*100,3),"%"))
 #             flush.console()
 #       }
 # })
-# rm(transMat2, i , index, non_list, timeFor, tkubimiimeApply)
+# rm(transMat2, i , index, non_list, timeFor, timeApply)
 # ----
 
 system.time({transMat <- t(sapply(transRaw$items, inject))})
