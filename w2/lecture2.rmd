@@ -16,6 +16,8 @@ library(ggplot2)
 ## Structure
 1. NaiveBayes
 2. Association rules
+    
+# Naive Bayes
 
 ## Labelling vs Classification
 - unclear division
@@ -23,8 +25,6 @@ library(ggplot2)
     - classification: assigning final classes, smaller number of classes
     - labelling: variable filling in preparation, larger number of classes
         - tree?
-    
-# Naive Bayes
 
 ## What is Naive Bayes?
 - simple machine learning algorithm
@@ -94,6 +94,20 @@ $$\frac{P(Y_{1}=y_{1}|X) * P(Y_{2}=y_{2}|X) * ... * P(Y_{n}=y_{n}|X)*P(X)}{P(Y)}
     + classification (churn)
 
 # Association rules
+
+## Complements & Substitutes
+
+## Summary
+- from microeconomics
+    - **C** defined by positive (**S** negative) cross-elasticity
+    - based just on price and quantity changes
+- basket data
+    - associated items
+    - based on actual behaviour
+- complement analysis is easier
+    - within-baskets
+    - substitution is cross-basket behaviour
+        - loyalty dimension
 
 ## Association mining
 - study of how situations happen together
