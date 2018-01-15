@@ -7,7 +7,7 @@ Expected topics:
 
 2.) NaiveBayes & Association rules
 
-3.) Distance & kNN - Recommendation systems
+3.) Distance & kNN
 
 4.) Clustering
 
@@ -15,9 +15,9 @@ Expected topics:
 
 6.) Pricing & Mixed effect models
 
-7.) Trees & Random Forests - Customer Churn
+7.) Trees & Random Forests
 
-8.) Markov chains & Agent Based Modelling - Marketing Attribution
+8.) Markov chains & Agent Based Modelling
 
 9.) Reporting methods
 

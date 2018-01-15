@@ -1,0 +1,267 @@
+---
+title: "Lecture 5"
+author: "Michal Kubi&#353;ta"
+date: "5 February 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
+                      cache = TRUE, fig.align='center',
+                      fig.width = 8, fig.height = 5)
+library(magrittr)
+library(ggplot2)
+library(gganimate)
+```
+
+## Structure
+1. Regression
+2. PCA
+
+# Regression
+
+##  {.flexbox .vcenter}
+
+<font size="24" color="orange"> **You tell me...**  
+recall you statistics / econometrics class </font>
+
+## Econometric approach
+OLS
+
+- statistical method
+- assumptions (Gauss-Markov)
+    1. linear relationship
+        - transformations
+    2. zero expected error ($E(\epsilon_{i}) = 0$)
+        - intercept
+    3. no perfect multicollinearity (full X matrix rank)
+    4. <font color="orange">**homoskedasticity**</font> ($E(\epsilon_{i}^{2}) = const$)
+        - slope
+        
+## OLS estimation
+$$\hat\beta = (X^{T}X)^{-1}X^{T}y$$
+**n** observations, **k** variables (\* = OK for small **k**)
+
+- $X^T \; complextity \; O(nk)$ *
+- $X^{T}X = T_{k*k} \; complexity \; O(n^{2}k)$ <font color="red">**!**</font>
+- $T^{-1} = U_{k*k} \; complexity \; O(k^{3})$ *
+- $UX^{T} = V_{k*n} \; complexity \; O(nk^{2})$ *
+- $Vy = W_{k*1} \; complexity \; O(nk)$ *
+
+>- what if **k** is not small?
+
+
+## Setup the estimation of the linear relationship
+ how to uniquely describe a line (2D) ?
+ 
+>- 2 parameters, slope and a point
+>- there is only 1 parameter to estimate - why?
+>- $(\bar X,\bar Y)$
+>- optimisation task
+
+## (i) random guess
+
+```{r rndAnim, fig.show='animate'}
+rand <- list()
+
+xhat <- mean(mtcars$drat)
+yhat <- mean(mtcars$wt)
+xmin <- min(mtcars$drat)
+xmax <- max(mtcars$drat)
+
+for(i in 1:10){
+  slope <- runif(1,-10,10)
+  ymax <- yhat + slope*(xmax - xhat)
+  ymin <- yhat + slope*(xmin - xhat)
+  rand[[i]] <- rbind(c(xmin, ymin, i),c(xmax, ymax, i))
+}
+
+rand <- do.call(rbind.data.frame, rand)
+colnames(rand) <- c("x","y","iter")
+
+rndPlot <-
+  ggplot(rand, aes(x = x, y = y, frame = iter))+
+  geom_line()+
+  geom_point(data = mtcars, aes(x = drat, y = wt), inherit.aes = F)
+
+gganimate(rndPlot)
+```
+
+## (ii) random guess + evolution
+
+- save the parameters and SSR of first iteration - best estimation
+- if other parameters lead to lower SSR
+    - rewrite the best estimation
+- new estimation close to the parameters of the best estimation 
+- <font color="orange">**very simple**</font> MCMC process
+  
+## (iii) random guess + evolution + reproduction
+
+1. generate many random "estimates" of slope
+2. find the best individuals
+    - less then threshold SSR
+    - or given number of best-fit individuals
+3. let them breed
+    - averaging, linear combinations
+4. find the best individuals of the extended population
+5. repeat 3. and 4. until convergence / stopping condition
+- simple evolution algorithm
+
+## Evolution estimation
+
+```{r evoAnim, fig.show='animate'}
+xhat <- mean(mtcars$drat)
+yhat <- mean(mtcars$wt)
+xmin <- rep(min(mtcars$drat), 4)
+xmax <- rep(max(mtcars$drat), 4)
+
+evo <- list()
+
+for(i in 1:10){
+  if(i == 1){
+    slope <- runif(10,-10,10)
+  } else{
+    slope <- c(slope, (slope[1]+slope[-1])/2)
+  }
+  
+  SSR <- c()
+  for(j in slope){
+    SSR <- c(SSR, sum((mtcars$wt - (mtcars$drat - xhat) * j - yhat)^2))
+  }
+  
+  parents <- order(SSR)[1:4]
+  
+  slope <- slope[parents]
+  
+  ymax <- yhat + slope*(xmax - xhat)
+  ymin <- yhat + slope*(xmin - xhat)
+  iter <- i
+  col <- rep(1:4, each = 2)
+  
+  evo[[i]] <- cbind(c(rbind(xmin,xmax)), c(rbind(ymin, ymax)), iter, col)
+  
+}
+evo <- do.call(rbind.data.frame, evo)
+colnames(evo) <- c("x", "y", "iter", "col")
+
+
+evoPlot <-
+  ggplot(evo, aes(x = x, y = y, frame = iter, col = as.factor(col)))+
+  geom_line()+
+  geom_point(data = mtcars, aes(x = drat, y = wt), inherit.aes = F)+
+  theme(legend.position = 'none')
+
+gganimate(evoPlot)
+```
+
+## (iv) gradient descent
+1. calculate the gradient of the function
+    - $SSR = \sum_i (y_{i} - \hat y_{i})^{2} =
+    \sum_i (y_{i} - (a + bx_{i}))^{2} =$  
+    $\sum_i (y_{i} - (\overline y - b \overline x) - bx_{i})^{2} = \sum_i (y_{i} - \overline y - b(x_{i} - \overline x))^{2}$
+    - $\frac{\nabla SSR}{n} = \frac{\partial SSR}{\partial b} * \frac{1}{n} = H(b)$
+2. generate initial random "estimate" of slope = $b_{0}$
+3. move a little in the direction of the gradient
+    - $b_{n} = b_{n-1} - \alpha H(b)$
+    - $\alpha = parameter$
+4. repeat 3. until convergence / stopping condition
+
+## Differences
+- for the purpose of fitting the linear relationship (no inference)
+    - no assumptions
+- for inference (prediction)
+    - mostly care about homoskedasticity & outliers
+       - different error function
+    - cross-validation
+- watch out for local optimas!
+    - ABC optimisation
+    
+# PCA
+
+## Principal Component Analysis
+- data transformation method
+    - correlated variables into uncorrelated
+- useful for dimension reduction
+- produces new orthogonal "variables"
+    - linear combination of the original ones
+- how would you estimate that?
+
+>- similar to linear model (without the intercept)
+>- different error function
+
+<!-- DRAW PICTURE -->
+<!-- EIGEN RECAP -->
+
+## Components
+- basically the unit eigenvectors of covariance matrix
+- new "axes"
+- sorted according to amount of variance explained
+    - proportion of explained variance equals proportion of eigenvalues
+    - first component captures the highest amount of variance
+    - dimension reduction = choosing $k$ components
+
+## Calculating eigen-decomposition
+```{r cov_mat, echo = TRUE}
+(mtcars[,3:4] %>% scale %>% assign("scaled", ., pos = 1) %>% cov %T>% print %>%
+   eigen -> eg)
+```
+
+## Graphically
+```{r cov_plot1, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+plot(scaled, asp = 1)
+```
+
+## Eigenvectors
+```{r cov_plot2, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+plot(scaled, asp = 1)
+abline(a = 0, b = 1, lty = 2)
+abline(a = 0, b = -1, lty = 2)
+```
+
+## Components
+```{r cov_plot3, fig.align = 'left', fig.width = 10, fig.height = 5.8}
+plot(scaled, asp = 1)
+abline(a = 0, b = 1, lty = 2)
+abline(a = 0, b = -1, lty = 2)
+lines(c(0,eg$vectors[1]),c(0,eg$vectors[2]), lwd = 2, col = "blue")
+lines(c(0,eg$vectors[3]),c(0,eg$vectors[4]), lwd = 2, col = "red")
+```
+
+## Reduced to 1D
+```{r eg_1, echo = TRUE, fig.align = 'left', fig.width = 9.5, fig.height = 5}
+{scaled %*% eg$vectors[,1]} %>% plot(ylab = "PC1")
+```
+
+## Compared with implemented function
+- stats::prcomp()
+    - using SVD, minor differences
+
+<div class="columns-2">
+```{r eg_compare}
+eg
+```
+
+```{r pca_compare}
+(prcomp(scaled) -> pca)
+```
+</div>
+
+## Plotting PCs
+```{r pc_plot}
+biplot(pca, cex = 0.5)
+```
+
+## Math behind - eigenvalue ~ explained variance
+$C = covariance \; matrix, n*m$  
+$w = vector, n*1, ||w|| = 1$ 
+$\lambda \in R$  
+
+Lagrange, maximise  
+$L = w^{T}Cw - \lambda(w^{T}w - 1)$  
+$\frac{\partial L}{\partial w} = 0 \Rightarrow Cw - \lambda w =0$  
+
+Substitute back
+$w^{T}Cw - \lambda(w^{T}w-1) = w^{T}Cw = \lambda w^{T} w = \lambda$

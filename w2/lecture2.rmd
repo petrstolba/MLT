@@ -16,9 +16,15 @@ library(ggplot2)
 ## Structure
 1. NaiveBayes
 2. Association rules
-
-
+    
 # Naive Bayes
+
+## Labelling vs Classification
+- unclear division
+- for our purposes:
+    - classification: assigning final classes, smaller number of classes
+    - labelling: variable filling in preparation, larger number of classes
+        - tree?
 
 ## What is Naive Bayes?
 - simple machine learning algorithm
@@ -35,27 +41,37 @@ $$P(X|Y) = \frac{P(Y|X)*P(X)}{P(Y)}$$
 Y - item producer - "Kofola"  
 X - item category - "soft drinks"  
   
-P(X|Y) = probability of item being "soft drink" given it's producer is  "Kofola"  
+P(X|Y) = probability of item being "soft drink" given it's producer is  "Kofola"  <hr>
+
 P(Y|X) = proportion of item produced by "Kofola" in category "soft drink"  
 P(X)   = proportion of "soft drink" items among all items  
 P(Y)   = proportion of items produced by "Kofola" among all items  
 
 ## Simple example
-<img src= "www/kofola.jpg" align="right" width="100">
+<img src= "www/kofola.jpg" align="right" width="200">
 100 items  
 20 soft drinks  
 5 Kofola - 4 in soft drinks, 1 not
   
-P(soft|Kofola) = 0.8  
 P(Kofola|soft) = 0.2  
 P(soft) = 0.2  
 P(Kofola) = 0.05  
+<hr>
+P(soft|Kofola) = 0.8  
 
 ## Why Naive?
 more variables? => chain rule!
 $$P(X|Y_{1}=y_{1},Y_{2}=y_{2},...,Y_{n}=y_{n}) = $$
 $$\frac{P(Y_{1}=y_{1} \cap Y_{2}=y_{2} \cap ... \cap Y_{n}=y_{n} |X)*P(X)}{P(Y)}$$
 <font color = "orange">**hard or heavy!**</font>
+
+<!-- k variables with total of 6k levels and C classes:
+     C * 6^k values in table 
+     10 manufacturers, 30 brands, 4 sizes, 40 flavours,
+     3 package types, 5 sugar content categories +
+     8 classes =>
+     8*10*30*4*30*3*5 = 4 320 000 possible combinations!
+     -->
 
 ## Why Naive? (ii)
 assumption: independence of events!
@@ -80,6 +96,20 @@ $$\frac{P(Y_{1}=y_{1}|X) * P(Y_{2}=y_{2}|X) * ... * P(Y_{n}=y_{n}|X)*P(X)}{P(Y)}
     + classification (churn)
 
 # Association rules
+
+## Complements & Substitutes
+
+## Summary
+- from microeconomics
+    - **C** defined by positive (**S** negative) cross-elasticity
+    - based just on price and quantity changes
+- basket data
+    - associated items
+    - based on actual behaviour
+- complement analysis is easier
+    - within-baskets
+    - substitution is cross-basket behaviour
+        - loyalty dimension
 
 ## Association mining
 - study of how situations happen together
@@ -134,8 +164,8 @@ $$lift(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp(X) * supp (Y)} $$
     + compared to independent events
         + **P(A) * P(B)**
     
-$$conf(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp (X)} $$
-$$lift(X \Rightarrow Y) = \frac{supp(X \cup Y)}{supp(X) * supp (Y)} $$
+$$conf(X \Rightarrow Y) = P(Y|X) = \frac{P(Y) \cap P(X)}{P(X)}$$
+$$lift(X \Rightarrow Y) = \frac{P(Y) \cap P(X)}{P(X) * P(Y)}$$
 
 ## Apriori summary
 - find frequent itemsets

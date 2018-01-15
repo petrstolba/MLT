@@ -122,7 +122,7 @@ library(magrittr)
 - [check the repo](https://github.com/MDA2018/lectures) (and watch it)
 
 - download the slides (sources)
-- should you find any mistake in the materials
+- should you find any mistke in the materials
     + suggest edit via pull request
 - submit done via [Github classroom](https://classroom.github.com/a/KtcVpIMo)
 
