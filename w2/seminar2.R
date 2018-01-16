@@ -223,7 +223,12 @@ url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/00352/Online%2
 
 download.file(url, "w2/data/online_retail.xlsx", mode = 'wb' )
 
-transRaw <- read_xlsx("w2/data/online_retail.xlsx")
+# transRaw <- read_xlsx("w2/data/online_retail.xlsx")
+# because of the problems with excel reading, after downloading the file
+# from Gdrive, run following
+# if you read the csv start from line 262 (sparseMatrix)
+transRaw <- fread("w2/data/online.csv")
+
 str(transRaw)
 
 transRaw %<>% 
@@ -254,8 +259,8 @@ transRaw %<>%
 transRaw[,3:4] <- apply(transRaw[,3:4],2,as.numeric)
 
 ## create sparse matrix based on IDs
-transMat <- t(sparseMatrix(i = transRaw$prodID,
-                         j = transRaw$transID))
+transMat <- sparseMatrix(i = transRaw$transID,
+                         j = transRaw$prodID)
 
 colnames(transMat) <- prodTable$Description
 rownames(transMat) <- transTable$InvoiceNo
