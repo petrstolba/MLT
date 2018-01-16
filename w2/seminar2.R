@@ -259,8 +259,10 @@ transRaw %<>%
 transRaw[,3:4] <- apply(transRaw[,3:4],2,as.numeric)
 
 ## create sparse matrix based on IDs
+
 transMat <- sparseMatrix(j = transRaw$transID,
                          i = transRaw$prodID)
+
 
 rownames(transMat) <- prodTable$Description
 colnames(transMat) <- transTable$InvoiceNo
