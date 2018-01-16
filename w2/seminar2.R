@@ -94,7 +94,8 @@ rm(newCols, index)
 
 #--- 1.2 LABELLING -------------------------------------------------------------
 if (!require("e1071")) {
-      install.packages("e1071")
+    install.packages("e1071")
+    require(e1071)
 }
 
 ## training
@@ -253,11 +254,11 @@ transRaw %<>%
 transRaw[,3:4] <- apply(transRaw[,3:4],2,as.numeric)
 
 ## create sparse matrix based on IDs
-transMat <- sparseMatrix(i = transRaw$prodID,
-                         j = transRaw$transID)
+transMat <- t(sparseMatrix(i = transRaw$prodID,
+                         j = transRaw$transID))
 
-rownames(transMat) <- prodTable$Description
-colnames(transMat) <- transTable$InvoiceNo
+colnames(transMat) <- prodTable$Description
+rownames(transMat) <- transTable$InvoiceNo
 
 ##--- 2.2.2 ASSOCIATIONS -------------------------------------------------------
 model <- apriori(transMat, parameter = list(support = 0.02, confidence = 0.25))
