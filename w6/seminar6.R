@@ -1,11 +1,12 @@
-lapply(
+sapply(
   c("data.table","tidyverse","magrittr",
     "arules","arulesViz","readxl"),
   require,
   character.only = T
 )
 
-transRaw <- as.data.table(read_xlsx("C:\\Users\\Michal\\Desktop\\online_retail.xlsx"))
+transRaw <-
+    as.data.table(read_xlsx("w2/data/online_retail.xlsx"))
 
 summary(transRaw)
 
@@ -27,8 +28,9 @@ transCoef <- trans[,.(elas = lm(log(Quantity)~log(UnitPrice))$coefficients[2]), 
 
 transCoef$elas %>% summary()
 
-transCoef$elasG <-cut(transCoef$elas,
+transCoef$elasG <- cut(transCoef$elas,
                       breaks = c(-14, -3, -1.2, 0, 6),
                       labels = c("H", "M", "L", "N"))
+
 
 
