@@ -5,7 +5,9 @@
 #####################
 
 setwd("w3/data")
-lapply(
+    ## very, very bad practise!
+
+sapply(
       c("data.table","dplyr","magrittr","ggplot2", "purrr"),
       require, character.only = T)
 
@@ -26,9 +28,14 @@ for(i in newFiles){
       file.rename(i, new)
 }
 
+readLines("README.txt") %>% 
+    gsub("-*","",.) %>% 
+    gsub("=*","",.) %>% 
+    .[!.==""] 
+
 ## clean the directory
 rm(i, newFiles, new)
-file.remove(c("data.zip","links.csv","README.txt"))
+file.remove(c("data.zip","links.csv", "README.txt"))
 unlink("ml-latest-small", recursive = TRUE)
 
 ## read input
@@ -168,22 +175,25 @@ ratings %>%
 
 # user's rating overview
 rat547 %>% summary()
-seq(0.5,5,by=0.5) %>% summary()
+seq(0.5,5,by = 0.5) %>% summary()
 
-qqplot(rat547$rating, seq(0.5,5,by=0.5))
+qqplot(seq(0.5,5,by = 0.5), rat547$rating)
 lines(0:5,0:5)
 
 # rating over time
-ggplot(rat547, aes(x = timestamp, y = rating))+
-      geom_line()+
+ggplot(rat547, aes(x = timestamp, y = rating)) +
+      geom_line() +
       geom_smooth(method = "loess")
 
 # choose threshold
+# this is a parametr!!!
+    ## it's choice needs discussion
 rat547$class <- ifelse(rat547$rating > 4, 1, 0)
 mean(rat547$class)
 
-if(!require(class)){
-      install.packages("class")
+if (!require(class)) {
+    install.packages("class")
+    library(class)
 }
 
 movies547 <- left_join(movies,rat547[,c("movieId","class")])
@@ -194,21 +204,21 @@ moviesTest <- movies547 %>% filter(is.na(class))
 
 #--- 2.2 CROSS-VALIDATION: FIND THE RIGHT "k" ---------------------------------
 set.seed(1234)
-indexTrain1<- sample(1:nrow(moviesTrain),1500)
+indexTrain1 <- sample(1:nrow(moviesTrain),1500)
 
 moviesTrain1 <- moviesTrain[indexTrain1,]
 moviesTrain2 <- moviesTrain[-indexTrain1,]
 
 result <- c()
-for(i in 1:160){
-      moviesTrain2$new <-
-            knn(moviesTrain1[,4:22],
-                moviesTrain2[,4:22],
-                moviesTrain1[,"class"],
-                i)
-      
-      result[i] <-mean(moviesTrain2$new == moviesTrain2$class)
-      print(result[i])
+for (i in 1:160) {
+    moviesTrain2$new <-
+        knn(moviesTrain1[,4:22],
+            moviesTrain2[,4:22],
+            moviesTrain1[,"class"],
+            i)
+    
+    result[i] <- mean(moviesTrain2$new == moviesTrain2$class)
+    print(result[i])
 }
 
 plot(1:i, result, type = "l")
@@ -224,15 +234,16 @@ moviesTest$new <-
 
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
 
-moviesTest[moviesTest$new ==1,] %>% View()
+moviesTest[moviesTest$new == 1,] %>% View()
 
 rm(moviesTest, moviesTrain, movies547, rat547, k)
 
 ##-- PART 3 - COLLABORATIVE FILTERING #########################################
 
 ##--- 3.1 - PREPARATIONS ------------------------------------------------------
-if(!require(tidyr)){
-      install.packages("tidyr")
+if (!require(tidyr)) {
+    install.packages("tidyr")
+    require(tidyr)
 }
 
 ratings[c(99041,99132),]
@@ -284,6 +295,7 @@ movies %>%
 ## what has the user already seen?
 movies %>%
       filter(movieId %in% userMov) %>% View()
+
 ratings[ratings$userId == user & ratings$movieId == no1,]
 
 rm(ratMR, item, userMov, indexCR, itemChoice, bestPicks, no1, user)

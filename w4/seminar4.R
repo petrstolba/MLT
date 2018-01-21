@@ -4,7 +4,7 @@
 ## 29 January 2018 ##
 #####################
 
-lapply(
+sapply(
       c("data.table","dplyr","magrittr","ggplot2",
         "purrr", "GGally", "cluster", "readxl", "tidyr"),
       require, character.only = T
@@ -195,7 +195,7 @@ distMat <- dist(itemSample)
 tree <- hclust(distMat, method = "complete")
 
 ## print out
-pdf("dendogram.pdf", width = 120, height = 75)
+pdf("w4/dendogram.pdf", width = 120, height = 75)
 plot(tree)
 abline(h = 40, col = "red")
 dev.off()
