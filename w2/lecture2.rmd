@@ -101,7 +101,7 @@ $$\frac{P(Y_{1}=y_{1}|X) * P(Y_{2}=y_{2}|X) * ... * P(Y_{n}=y_{n}|X)*P(X)}{P(Y)}
 
 ## Summary
 - from microeconomics
-    - **C** defined by positive (**S** negative) cross-elasticity
+    - **C** defined by negative (**S** positive) cross-elasticity
     - based just on price and quantity changes
 - basket data
     - associated items

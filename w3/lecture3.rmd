@@ -34,9 +34,9 @@ D <- data.frame(a = c(1,2,2,3,3),
                 b = c(1,1,2,2,3))
 
 ggplot(D, aes(x = a, y = b)) +
-      geom_line(color = "orange") +
-      coord_equal(ratio = 1) +
-      geom_point(data = D[c(1, nrow(D)),], size = 2, color = "orange")
+    geom_line(color = "orange") +
+    coord_equal(ratio = 1) +
+    geom_point(data = D[c(1, nrow(D)),], size = 2, color = "orange")
 ```
 
 ## What is a distance? (ii)
@@ -44,17 +44,14 @@ ggplot(D, aes(x = a, y = b)) +
 Euclidean
 
 ```{r distances - euclidean}
-# D <- data.frame(a = c(1,3),
-#                 b = c(1,3))
-
 D <- data.frame(a = seq(1,3, by = 0.1),
                 b = seq(1,3, by = 0.1))
 
 
 ggplot(D, aes(x = a, y = b)) +
-      geom_line(color = "orange") +
-      geom_point(data = D[c(1,nrow(D)),], color = "orange") +
-      coord_equal(ratio = 1)
+    geom_line(color = "orange") +
+    geom_point(data = D[c(1,nrow(D)),], color = "orange") +
+    coord_equal(ratio = 1)
       
 ```
 
@@ -69,7 +66,7 @@ $$H(x,y) = \sum_{i=1}^{n} 1_{x_{i} \ne y_{i}}$$
 - scale dummies OR
 - Gower metric (scaled distances)
 
-$$G(x,y) = \frac{1}{n} \sum_{i=1}^{n} \frac{|x_{in} - x_{jn}|}{range(n)} $$
+$$G(x,y) = \frac{1}{p} \sum_{n=1}^{p} \frac{|x_{in} - x_{jn}|}{range(n)} $$
 
 # k-Nearest neighbourhoods
 
@@ -79,14 +76,15 @@ $$G(x,y) = \frac{1}{n} \sum_{i=1}^{n} \frac{|x_{in} - x_{jn}|}{range(n)} $$
 a <- c(rnorm(20,1,1),rnorm(20,5,1))
 b <- c(rnorm(20,1,1),rnorm(20,5,1))
 c <- c(rep(1,20), rep(2,20))
-      
+
 D <- data.frame(a,b,c)
 
 point <- data.frame(a = 2, b = 4, c = 0)
-      
+
 ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
-      geom_point() +
-      geom_point(data = point)
+    geom_point() +
+    geom_point(data = point) +
+    theme(legend.position = "none")
 
 ```
 
@@ -96,17 +94,17 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
 D <- rbind(point, D)
 
 dist(D[,1:2]) %>%
-      as.matrix() %>%
-      .[-1,1] %>%
-      .[order(.)] %>%
-      names %>%
-      as.numeric() -> distInd
+    as.matrix() %>%
+    .[-1,1] %>%
+    .[order(.)] %>%
+    names %>%
+    as.numeric() -> distInd
 
 ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
-      geom_point() +
-      geom_point(data = point) +
-      geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45")
+    geom_point() +
+    geom_point(data = point) +
+    geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45")
 ```
 
 ## Two closest points?
@@ -114,12 +112,12 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
 ```{r 2nn_fig}
 
 ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
-      geom_point() +
-      geom_point(data = point) +
-      geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45")
+    geom_point() +
+    geom_point(data = point) +
+    geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45") +
+    geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45")
 ```
 
 ## K closest points?
@@ -127,18 +125,18 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
 ```{r knn_fig}
 
 ggplot(D, aes(x = a, y = b, color = as.factor(c))) + 
-      geom_point() +
-      geom_point(data = point) +
-      geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[3]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[4]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45") +
-      geom_line(data = D[c(1,distInd[5]),], aes(x = a, y = b),
-                inherit.aes = F, color = "gray45")
+    geom_point() +
+    geom_point(data = point) +
+    geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45") +
+    geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45") +
+    geom_line(data = D[c(1,distInd[3]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45") +
+    geom_line(data = D[c(1,distInd[4]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45") +
+    geom_line(data = D[c(1,distInd[5]),], aes(x = a, y = b),
+              inherit.aes = F, color = "gray45")
       
 ```
 
@@ -157,8 +155,8 @@ D2 <- data.frame(a, b, c)
 point <- data.frame(a = 2.9, b = 5.8, c = 0)
 
 ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
-      geom_point() +
-      geom_point(data = point)
+    geom_point() +
+    geom_point(data = point)
       
 ```
 
@@ -226,10 +224,10 @@ ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
 - incidence matrix 
 ```{r customer_history}
 M <-
-      matrix(
-            sample(c(0,1), 20, replace = T),
-             ncol = 4
-      )
+    matrix(
+        sample(c(0,1), 20, replace = T),
+        ncol = 4
+    )
 rownames(M) <- paste0(rep("u",5),1:5)
 
 colnames(M) <- paste0(rep("m",4),1:4)
