@@ -169,24 +169,24 @@ ratings$userId %>%
     table() %>% 
     as.data.frame() %>% View()
 
-# choose user
+## choose user
 ratings %>% 
     filter(userId == "547") -> rat547
 
-# user's rating overview
+## user's rating overview
 rat547 %>% summary()
 seq(0.5,5,by = 0.5) %>% summary()
 
 qqplot(seq(0.5,5,by = 0.5), rat547$rating)
 lines(0:5,0:5)
 
-# rating over time
+## rating over time
 ggplot(rat547, aes(x = timestamp, y = rating)) +
     geom_line() +
     geom_smooth(method = "loess")
 
-# choose threshold
-# this is a parametr!!!
+## choose threshold
+## this is a parametr!!!
     ## it's choice needs discussion
 rat547$class <- ifelse(rat547$rating > 4, 1, 0)
 mean(rat547$class)
@@ -235,6 +235,10 @@ moviesTest$new <-
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
 
 moviesTest[moviesTest$new == 1,] %>% View()
+
+movies547[moviesTest$new == 1,4:22] %>%
+    map_dbl(mean) %>%
+    .[order(., decreasing = T)]
 
 rm(moviesTest, moviesTrain, movies547, rat547, k)
 
@@ -312,18 +316,19 @@ user[userID,] %>% table() %>% rev() -> bestPicks
 bestPicks
 
 ## at least 10 users
+    ## parameter again!
 index <- which.max(cumsum(bestPicks) >= 10)
 names(bestPicks) %>% as.numeric() %>% .[seq_len(index)] -> index
 
 user[userID,] %in% index %>% which() %>% rownames(user)[.] -> userSim
 
 ## movies watched by similar users 
-ratings %>% 
+(ratings %>% 
     filter(userId %in% userSim) %>%
     select(movieId) %>%
     table() %>%
     as.data.frame(stringsAsFactors = FALSE) %>% 
-    arrange(desc(Freq)) -> recom
+    arrange(desc(Freq)) -> recom)
 
 ## recommended movies
 View(movies %>% 
