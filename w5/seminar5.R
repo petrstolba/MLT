@@ -4,9 +4,12 @@
 ## 5 February 2018 ##
 #####################
 
+# install.packages("rpart")
+# install.packages("rattle")
+
 sapply(
     c("data.table","dplyr","magrittr","ggplot2",
-      "purrr", "GGally", "readxl"),
+      "purrr", "GGally", "readxl", "rpart", "rattle"),
     require, character.only = T
 )
 
@@ -66,6 +69,7 @@ pur <- raw[,.(pur_ID = unique(`Order ID`),
               prod_ID = unique(`Product ID`),
               sales = Sales,
               items = Quantity,
+              price = Sales/Quantity,
               promo = Discount),
            by = "Row ID"]
 
@@ -84,22 +88,132 @@ object.size(raw) %>% format(units = "Mb")
 rm(raw)
 
 # ANALYTICS!
-pur[,.(sales = sum(sales),
+pur[,
+    promoC := ifelse(promo == 0, 0, 1)
+    ][,
+      .(cust_ID = unique(cust_ID),
+       sales = sum(sales),
        items = sum(items),
-       price = mean(sales/items)),
-    by = "pur_ID"] -> bas
+       price = mean(sales/items),
+       promoC = sum(promoC),
+       noSKU = .N),
+    by = "pur_ID"
+    ][,
+      promoC := promoC/noSKU
+      ] -> bas
 
 # sales histogram
-ggplot(bas#[sales < 1000,]
-       , aes(x = sales)) +
+ggplot(bas, aes(x = sales)) +
     geom_histogram(binwidth = 1000)
+
+ggplot(bas[sales < 1000,], aes(x = sales)) +
+    geom_histogram(binwidth = 100)
+
 
 # the lower the prices, the more the items?
 ggplot(bas, aes(x = items, y = price)) +
+    geom_point() +
+    geom_smooth(method = "loess")
+
+# basket promo share
+ggplot(bas[order(bas$promoC),], aes(x = 1:nrow(bas), y = promoC)) +
+    geom_line()
+
+# basket unique SKU
+ggplot(bas[order(bas$noSKU),], aes(x = 1:nrow(bas), y = noSKU)) +
+    geom_line()
+
+# relation between unique SKU and number of items bought
+ggplot(bas, aes(x = noSKU, y = items)) +
     geom_point()
+    # BAD IDEA!
+
+ggplot(bas, aes(x = noSKU, y = items)) +
+    geom_jitter()
+
+ggplot(bas, aes(x = as.factor(noSKU), y = items)) +
+    geom_boxplot()
 
 # customer segmentation
+pur[,
+    .(unSKU = length(unique(prod_ID)),
+      itemsSKU = mean(items),
+      priceSKU = mean(price),
+      promoSKU = mean(promo)),
+    by = "cust_ID"] -> custStats
+
+bas[,
+    .(basSKU = mean(noSKU),
+      valueBas = mean(sales),
+      itemsBas = mean(items),
+      priceBas = mean(price)),
+    by = "cust_ID"] -> basStats
+
+custStats[basStats, on = "cust_ID"][cust[,.(cust_ID, segment)],, on = "cust_ID"] -> custStats
+rm(basStats)
+
+custStats$segment %>% unique
+
+custStats %<>% 
+    mutate(Corp = ifelse(segment == "Corporate", 1, 0)) %>% 
+    mutate(HO = ifelse(segment == "Home Office", 1, 0)) %>% 
+    select(-segment)
+
+custStats %>% summary()
+    
+custStatsS <- custStats[,-1]
+rownames(custStatsS) <- custStats[,1]
+custStatsS <- apply(custStatsS, 2, scale)
+
+ss <- rep(NA, 20)
+for (i in 1:20) {
+    ss[i] <- kmeans(custStatsS, i)$tot.withinss
+}
+plot(1:20, ss, type = "b")
+k = 5
+
+custStats$group <- kmeans(custStatsS, k)$cluster
+rm(custStatsS)
+table(custStats$group)
+
+tree <- rpart(as.factor(group)~., custStats[,-1])
+fancyRpartPlot(tree)
+
+custStats$cust_ID <- rownames(custStats)
+cust <- cust[custStats, on = "cust_ID"]
 
 # product segmentation
+pur[,
+    .(custPen = length(unique(cust_ID))/nrow(cust),
+      basPen = length(unique(pur_ID))/nrow(bas),
+      items = mean(items),
+      price = mean(price),
+      promo = mean(promo)),
+    by = "prod_ID"] -> prodStats
 
-# 
+prodStats[prod[,.(prod_ID, cat)], on = "prod_ID"
+          ][,furn := ifelse(cat == "Furniture", 1, 0)
+            ][,tech := ifelse(cat == "Technology", 1, 0)
+              ][!duplicated(prod_ID), !"cat"] -> prodStats
+
+rownames(prodStats) <- prodStats$prod_ID
+prodStats <- prodStats[,-1]
+
+prodStatsS <- apply(prodStats, 2, scale)
+
+cluster <- hclust(dist(prodStatsS)^2, method = "complete")
+plot(cluster)
+
+res <- rep(NA, 20)
+for (i in 1:20) {
+    res[i] <- kmeans(prodStatsS, i)$tot.withinss
+}
+
+plot(1:20, res, type = "b")
+k = 4
+
+prodStats$group <- kmeans(prodStatsS, k)$cluster
+
+tree <- rpart(as.factor(group) ~ ., prodStats[,-1])
+fancyRpartPlot(tree)
+
