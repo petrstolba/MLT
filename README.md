@@ -1,7 +1,7 @@
 # Marketing Data Analysis 2018
 This repository contains all lectures and seminars for Marketign Data Analysis course taught in 2018 by Michal Kubišta on CERGE-EI.
 
-Data 16/1/2018 https://drive.google.com/open?id=1KJ2DgBnceU7SJ_B-apt6mHoi-qxCd9FN
+Q&A form: https://docs.google.com/spreadsheets/d/1b53lLWE97VncXbQdukqqcoFHL6_ggd2F-ZQJ0tEccR4/edit?usp=sharing
 
 Expected topics:
 

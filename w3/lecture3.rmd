@@ -66,7 +66,7 @@ $$H(x,y) = \sum_{i=1}^{n} 1_{x_{i} \ne y_{i}}$$
 - scale dummies OR
 - Gower metric (scaled distances)
 
-$$G(x,y) = \frac{1}{p} \sum_{n=1}^{p} \frac{|x_{in} - x_{jn}|}{range(n)} $$
+$$G(x,y) = \frac{1}{p} \sum_{n=1}^{p} \frac{|x_{n} - y_{n}|}{range(n)} $$
 
 # k-Nearest neighbourhoods
 
@@ -104,7 +104,8 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
     geom_point() +
     geom_point(data = point) +
     geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
-              inherit.aes = F, color = "gray45")
+              inherit.aes = F, color = "gray45") +
+    theme(legend.position = "none")
 ```
 
 ## Two closest points?
@@ -117,7 +118,8 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
     geom_line(data = D[c(1,distInd[1]),], aes(x = a, y = b),
               inherit.aes = F, color = "gray45") +
     geom_line(data = D[c(1,distInd[2]),], aes(x = a, y = b),
-              inherit.aes = F, color = "gray45")
+              inherit.aes = F, color = "gray45") +
+    theme(legend.position = "none")
 ```
 
 ## K closest points?
@@ -136,7 +138,8 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
     geom_line(data = D[c(1,distInd[4]),], aes(x = a, y = b),
               inherit.aes = F, color = "gray45") +
     geom_line(data = D[c(1,distInd[5]),], aes(x = a, y = b),
-              inherit.aes = F, color = "gray45")
+              inherit.aes = F, color = "gray45") +
+    theme(legend.position = "none")
       
 ```
 
@@ -156,7 +159,8 @@ point <- data.frame(a = 2.9, b = 5.8, c = 0)
 
 ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
     geom_point() +
-    geom_point(data = point)
+    geom_point(data = point) +
+    theme(legend.position = "none")
       
 ```
 
