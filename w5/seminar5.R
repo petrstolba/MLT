@@ -128,11 +128,11 @@ ggplot(bas, aes(x = noSKU, y = items)) +
     geom_point()
     # BAD IDEA!
 
-ggplot(bas, aes(x = noSKU, y = items)) +
-    geom_jitter()
-
 ggplot(bas, aes(x = as.factor(noSKU), y = items)) +
     geom_boxplot()
+
+ggplot(bas, aes(x = noSKU, y = items)) +
+    geom_jitter()
 
 # customer segmentation
 pur[,
@@ -149,7 +149,8 @@ bas[,
       priceBas = mean(price)),
     by = "cust_ID"] -> basStats
 
-custStats[basStats, on = "cust_ID"][cust[,.(cust_ID, segment)],, on = "cust_ID"] -> custStats
+custStats[basStats, on = "cust_ID"
+          ][cust[,.(cust_ID, segment)],, on = "cust_ID"] -> custStats
 rm(basStats)
 
 custStats$segment %>% unique
@@ -165,6 +166,7 @@ custStatsS <- custStats[,-1]
 rownames(custStatsS) <- custStats[,1]
 custStatsS <- apply(custStatsS, 2, scale)
 
+set.seed(567)
 ss <- rep(NA, 20)
 for (i in 1:20) {
     ss[i] <- kmeans(custStatsS, i)$tot.withinss
@@ -197,9 +199,9 @@ prodStats[prod[,.(prod_ID, cat)], on = "prod_ID"
               ][!duplicated(prod_ID), !"cat"] -> prodStats
 
 rownames(prodStats) <- prodStats$prod_ID
-prodStats <- prodStats[,-1]
 
-prodStatsS <- apply(prodStats, 2, scale)
+prodStatsS <- apply(prodStats[,-1], 2, scale)
+rownames(prodStatsS) <- prodStats$prod_ID
 
 cluster <- hclust(dist(prodStatsS)^2, method = "complete")
 plot(cluster)
@@ -208,7 +210,6 @@ res <- rep(NA, 20)
 for (i in 1:20) {
     res[i] <- kmeans(prodStatsS, i)$tot.withinss
 }
-
 plot(1:20, res, type = "b")
 k = 4
 
@@ -217,3 +218,21 @@ prodStats$group <- kmeans(prodStatsS, k)$cluster
 tree <- rpart(as.factor(group) ~ ., prodStats[,-1])
 fancyRpartPlot(tree)
 
+# which customers which items?
+pur[cust[,.(cust_ID, group)], on = "cust_ID"
+    ][prodStats[,.(prod_ID, group)], on = "prod_ID"] -> purGrp
+
+setnames(purGrp, c("group", "i.group"), c("custG", "prodG"))
+
+purGrp[,.(custG, prodG)
+       ][,.(freq = .N),
+         by = .(custG, prodG)] -> purGrp
+
+custSum <- purGrp[,.(sum = sum(freq)), by = "custG"]
+
+purGrp[custSum, on = "custG"
+       ][,share := freq/sum
+         ][,.(custG, prodG, share)] -> purGrp
+
+ggplot(purGrp, aes(x = custG, y = share , fill = as.factor(prodG))) +
+    geom_col()
