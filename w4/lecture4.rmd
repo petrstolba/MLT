@@ -21,10 +21,19 @@ set.seed(123)
 ```
 
 ## Structure
-1.  Clustering introduction
-2.  K-means 
-3.  Hierarchical method
-4.  DBSCAN
+1.  Distance recap
+2.  Clustering introduction
+3.  K-means 
+4.  Hierarchical method
+5.  DBSCAN
+
+# Distance recap
+
+## 
+- definition
+- mixed data
+- Euclidean
+- Gower
 
 # Clustering introduction
 
@@ -217,9 +226,9 @@ ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))
 
 ## Overview
 - segment data into a hierarchy
-    - clusters needs to be chosen later 
+    - clusters will be defined later 
 - greedy: will cluster all observations
-    - outliers visually distinguishable
+    - outliers should be visually distinguishable
 - assuming points always closer to **own label** than to **other label** observations
 
 ## Algorithm - agglomerative

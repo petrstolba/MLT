@@ -5,10 +5,10 @@
 #####################
 
 sapply(
-      c("data.table","dplyr","magrittr","ggplot2",
-        "purrr", "GGally", "cluster", "readxl", "tidyr"),
-      require, character.only = T
-      )
+    c("data.table","dplyr","magrittr","ggplot2",
+      "purrr", "GGally", "cluster", "readxl", "tidyr"),
+    require, character.only = T
+)
 
 #-- PART 1 - kMeans vs hclust #################################################
 
@@ -23,27 +23,27 @@ summary(wholesale)
 
 ## unique region and channel values
 wholesale %>%
-      select(Channel, Region) %>% 
-      map(unique)
-      ## no need to recode
+    select(Channel, Region) %>% 
+    map(unique)
+## no need to recode
 
 table(wholesale[,1:2])
 ggpairs(wholesale[,-1:-2])
 
 ## log scalling
 wholesale %>% 
-      select(Fresh : Delicassen) %>% 
-      map_df(log) %>% 
-      cbind(wholesale[,1:2],.) -> wholeLg
+    select(Fresh : Delicassen) %>% 
+    map_df(log) %>% 
+    cbind(wholesale[,1:2],.) -> wholeLg
 
 ggpairs(wholeLg[,-1:-2])
 
 ## aggregation
 wholeLg[,
-          lapply(.SD, mean),
-          by = .(Region),
-          .SDcols = colnames(wholesale)[-1:-2]
-          ]
+        lapply(.SD, mean),
+        by = .(Region),
+        .SDcols = colnames(wholesale)[-1:-2]
+        ]
 
 wholeLg[,
         lapply(.SD, mean),
@@ -52,33 +52,36 @@ wholeLg[,
         ]
 
 ## boxplots of original and scalled data
+par(mfrow = 2:3)
 for (i in colnames(wholesale)[-1:-2]) {
-      boxplot(wholesale[,i, with = FALSE], main = i)
+    boxplot(wholesale[,i, with = FALSE], main = i)
 }
 
 for (i in colnames(wholeLg)[-1:-2]) {
-      boxplot(wholeLg[,i, with = FALSE], main = i)
+    boxplot(wholeLg[,i, with = FALSE], main = i)
 }
+par(mfrow = c(1,1))
 
 ## outlier stalker
 detect_outliers <- function(x){
-      upperBound <- median(x) + 1.5 * IQR(x)
-      lowerBound <- median(x) - 1.5 * IQR(x)
-      which(x > upperBound | x < lowerBound)
+    upperBound <- median(x) + 1.5 * IQR(x)
+    lowerBound <- median(x) - 1.5 * IQR(x)
+    which(x > upperBound | x < lowerBound)
 }
 
 ## stalking outliers
-wholesale %>% 
-      select(Fresh : Delicassen) %>% 
-      map(detect_outliers) %>% 
-      unlist %>%
-      table() %>%
-      as.data.frame() %>% 
-      .[order(.$Freq, decreasing = T),] %T>%
-      # View() %>% 
-      filter(Freq > 4) %>%
-      .[,1] %>% 
-      as.numeric() -> outIndex
+wholeLg %>% 
+    select(Fresh : Delicassen) %>% 
+    map(detect_outliers) %>% 
+    unlist %>%
+    table() %>%
+    as.data.frame() %>% 
+    .[order(.$Freq, decreasing = T),] %T>%
+    View() %>%
+    filter(Freq > 2) %>%
+    .[,1] %>% 
+    as.character() %>% 
+    as.numeric() -> outIndex
 
 wholeC <- wholeLg[-outIndex,]
 rm(outIndex, detect_outliers)
@@ -89,8 +92,8 @@ set.seed(12345)
 ## elbow estimation
 clusters <- c()
 for (i in 1:10) {
-     clusters <- c(clusters, kmeans(wholeC[,-1:-2],i)$tot.withinss)
-      
+    clusters <- c(clusters, kmeans(wholeC[,-1:-2],i)$tot.withinss)
+    
 }
 
 plot(1:i, clusters, type = "b")
@@ -109,11 +112,11 @@ kModel <- kmeans(wholeC[,-1:-2],k)
 wholeC$clust <- kModel$cluster
 
 ggplot(wholeC, aes(x = Channel, y = Region, color = as.factor(clust))) +
-      geom_jitter()
+    geom_jitter()
 
 ## cluster explanations?
-for (i in 1:k) {
-      print(wholeC[wholeC$clust == i,.(Channel, Region)] %>% table())
+for (i in seq_len(k)) {
+    print(wholeC[wholeC$clust == i,.(Channel, Region)] %>% table())
 }
 
 clusplot(wholeC, kModel$cluster, color = TRUE, shade = T, labels = 1)
@@ -127,13 +130,13 @@ plot(hModel)
 
 ## find the longest line
 heights <-
-      hModel$height %>% 
-      .[order(.)]
-      
+    hModel$height %>% 
+    .[order(.)]
+
 (diff(heights,lag = 1) %>%
-            which.max() %>%
-            add(1) %>%
-            heights[.] -> h)
+        which.max() %>%
+        add(1) %>%
+        heights[.] -> h)
 
 ## label groups
 rect.hclust(hModel, h = h)
@@ -144,12 +147,12 @@ groups %>% table
 
 ## visualisation 
 ggplot(wholeC, aes(x = Channel, y = Region, color = as.factor(groups))) +
-      geom_jitter()
+    geom_jitter()
 
 clusplot(wholeC[,-1:-2], groups , color = TRUE, 
          shade = T, labels = 1, lines = 0)
 
-
+rm(list = ls())
 #-- PART 2 - hclust & basket ##################################################
 purchase <- read_xlsx("w2/data/online_retail.xlsx")
 
@@ -159,15 +162,18 @@ summary(purchase)
 
 ## remove unvalidated transactions
 purchase %<>% 
-      filter(Quantity > 0, UnitPrice > 0, !is.na(CustomerID))
+    filter(Quantity > 0, UnitPrice > 0, !is.na(CustomerID))
 
 summary(purchase)
 
-## item frequencies and "transation (client) table"
-itemFreq <- as.data.table(purchase)[,.(freq = .N), by = .(CustomerID, StockCode)]
-# View(head(itemFreq, 500), "itemFreq")
+## item frequencies and "transaction (client) table"
+itemFreq <-
+    as.data.table(purchase)[,.(freq = .N), by = .(CustomerID, StockCode)]
+View(head(itemFreq, 500), "itemFreq")
+
 custItem <- spread(itemFreq, StockCode, freq, fill = 0)
-# colnames(custItem)[1:10]
+colnames(custItem)[1:10]
+
 rownames(custItem) <- custItem$CustomerID
 custItem$CustomerID <- NULL
 custItem <- as.matrix(custItem)
@@ -178,10 +184,10 @@ incidence[incidence > 0] <- 1
 
 ## item x item factorisation
 items <- t(custItem) %*% incidence
-# View(items[1:10,1:10])
+View(items[1:10,1:10])
 
 ## do not divide by zero!
-items[items == 0] <- 0.1
+items[items == 0] <- 0.001
 items <- 1/items
 
 ## same items are very close
@@ -192,7 +198,7 @@ itemSample <- items[1:500,1:500]
 
 ## cluster items
 distMat <- dist(itemSample)
-tree <- hclust(distMat, method = "complete")
+tree <- hclust(distMat^2, method = "complete")
 
 ## print out
 pdf("w4/dendogram.pdf", width = 120, height = 75)
@@ -202,9 +208,9 @@ dev.off()
 
 ## prepare the items desc and sales
 purchase %>% 
-      # filter(StockCode %in% c("20667","21310","17028J","17001","20816")) %>% 
-      filter(StockCode %in% c("20861", "16169P","17007B")) %>%
-      select(StockCode, Description) %>%
-      unique()
+    # filter(StockCode %in% c("20667","21310","17028J","17001","20816")) %>% 
+    filter(StockCode %in% c("20861", "16169P","17007B")) %>%
+    select(StockCode, Description) %>%
+    unique()
 
 as.data.table(purchase)[,.(Qty = sum(Quantity)), by = StockCode] -> itemSales
