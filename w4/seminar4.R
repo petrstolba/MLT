@@ -214,5 +214,3 @@ purchase %>%
     filter(StockCode %in% c("20861", "16169P","17007B")) %>%
     select(StockCode, Description) %>%
     unique()
-
-as.data.table(purchase)[,.(Qty = sum(Quantity)), by = StockCode] -> itemSales
