@@ -27,6 +27,10 @@ set.seed(123)
 4.  Hierarchical method
 5.  DBSCAN
 
+## Literature
+- [Machine Learning with R](https://www.amazon.com/Machine-Learning-R-Brett-Lantz/dp/1782162143)
+- [R for Marketing Research and Analytics](https://www.amazon.com/Marketing-Research-Analytics-Use/dp/3319144359)
+
 # Distance recap
 
 ## 

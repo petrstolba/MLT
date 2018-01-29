@@ -38,6 +38,17 @@ wholesale %>%
 
 ggpairs(wholeLg[,-1:-2])
 
+## boxplots of original and scalled data
+par(mfrow = 2:3)
+for (i in colnames(wholesale)[-1:-2]) {
+    boxplot(wholesale[,i, with = FALSE], main = i)
+}
+
+for (i in colnames(wholeLg)[-1:-2]) {
+    boxplot(wholeLg[,i, with = FALSE], main = i)
+}
+par(mfrow = c(1,1))
+
 ## aggregation
 wholeLg[,
         lapply(.SD, mean),
@@ -50,17 +61,6 @@ wholeLg[,
         by = .(Channel),
         .SDcols = colnames(wholesale)[-1:-2]
         ]
-
-## boxplots of original and scalled data
-par(mfrow = 2:3)
-for (i in colnames(wholesale)[-1:-2]) {
-    boxplot(wholesale[,i, with = FALSE], main = i)
-}
-
-for (i in colnames(wholeLg)[-1:-2]) {
-    boxplot(wholeLg[,i, with = FALSE], main = i)
-}
-par(mfrow = c(1,1))
 
 ## outlier stalker
 detect_outliers <- function(x){
@@ -79,6 +79,7 @@ wholeLg %>%
     .[order(.$Freq, decreasing = T),] %T>%
     View() %>%
     filter(Freq > 2) %>%
+    # parameter!
     .[,1] %>% 
     as.character() %>% 
     as.numeric() -> outIndex
@@ -90,19 +91,19 @@ rm(outIndex, detect_outliers)
 set.seed(12345)
 
 ## elbow estimation
-clusters <- c()
+### are the clusters even there?
+inter <- c()
 for (i in 1:10) {
-    clusters <- c(clusters, kmeans(wholeC[,-1:-2],i)$tot.withinss)
+    inter <- c(inter, kmeans(wholeC[,-1:-2],i)$tot.withinss)
     
 }
+plot(1:i, inter, type = "b")
+lines(c(2,10), inter[c(2,10)], col = "green")
+lines(c(3,10), inter[c(3,10)], col = "red")
+lines(c(4,10), inter[c(4,10)], col = "blue")
 
-plot(1:i, clusters, type = "b")
-lines(c(2,10), clusters[c(2,10)], col = "green")
-lines(c(3,10), clusters[c(3,10)], col = "red")
-lines(c(4,10), clusters[c(4,10)], col = "blue")
-
-(clusters / clusters[1]) %>% diff(1) * 100
-rm(i,clusters)
+(inter / inter[1]) %>% diff(1) * 100
+rm(i,inter)
 
 ## "discussion about why to choose k = 2" 
 k <- 2
@@ -153,6 +154,7 @@ clusplot(wholeC[,-1:-2], groups , color = TRUE,
          shade = T, labels = 1, lines = 0)
 
 rm(list = ls())
+
 #-- PART 2 - hclust & basket ##################################################
 purchase <- read_xlsx("w2/data/online_retail.xlsx")
 
