@@ -1,5 +1,5 @@
 ---
-title: "Lecture 5"
+title: "Lecture 6"
 author: "Michal Kubi&#353;ta"
 date: "12 February 2018"
 output:
@@ -74,7 +74,7 @@ $ln Q = \alpha + \beta_{0} \ln P_{0} + \beta_{1} \ln P_{1} + \cdots + \beta_{n} 
     - determines the price change direction
 - together:
     - where I want to move the price
-    - is it desirable
+    - is it desirable?
     
 ## PIE matrix
 - not a technical term
@@ -83,10 +83,10 @@ $ln Q = \alpha + \beta_{0} \ln P_{0} + \beta_{1} \ln P_{1} + \cdots + \beta_{n} 
 set.seed(1438)
 pieMat <- data.frame(id = c(1:20), pi = sample(1:3,20,TRUE), e = sample(1:3,20,TRUE))
 
-ggplot(pieMat, aes(x = pi, y = e, col = as.factor(id)))+
-  geom_jitter(width = 0.15, height = 0.15)+
-  scale_y_continuous(name = "elasticity", breaks = 0.5:3.5, limits = c(0.63,3.37))+
-  scale_x_continuous(name = "price index", breaks = 0.5:3.5, limits = c(0.63,3.37))+
+ggplot(pieMat, aes(x = pi, y = e, col = as.factor(id))) +
+  geom_jitter(width = 0.15, height = 0.15) +
+  scale_y_continuous(name = "elasticity", breaks = 0.5:3.5, limits = c(0.63,3.37)) +
+  scale_x_continuous(name = "price index", breaks = 0.5:3.5, limits = c(0.63,3.37)) +
   theme(panel.grid.major = element_line(color = "black"),
         legend.position = "none",
         axis.text = element_blank(),
@@ -99,18 +99,18 @@ ggplot(pieMat, aes(x = pi, y = e, col = as.factor(id)))+
 
 ## PIE matrix interpretation
 ```{r PIE_explained}
-ggplot(pieMat, aes(x = pi, y = e, col = as.factor(id)))+
-  geom_jitter(width = 0.15, height = 0.15)+
-  scale_y_continuous(name = "elasticity", breaks = 0.5:3.5, limits = c(0.63,3.37))+
-  scale_x_continuous(name = "price index", breaks = 0.5:3.5, limits = c(0.63,3.37))+
+ggplot(pieMat, aes(x = pi, y = e, col = as.factor(id))) +
+  geom_jitter(width = 0.15, height = 0.15) +
+  scale_y_continuous(name = "elasticity", breaks = 0.5:3.5, limits = c(0.63,3.37)) +
+  scale_x_continuous(name = "price index", breaks = 0.5:3.5, limits = c(0.63,3.37)) +
   geom_rect(xmin=0.5, xmax = 1.5, ymin = 0.5, ymax = 1.5,
-            color= "#E99042", alpha = 0, size = 1.5)+
+            color= "#E99042", alpha = 0, size = 1.5) +
   geom_rect(xmin = 2.5, xmax = 3.5, ymin = 2.5, ymax = 3.5,
-            color = "#E99042", alpha = 0, size = 1.5)+
+            color = "#E99042", alpha = 0, size = 1.5) +
   annotate("segment", x = 1.3, xend= 1.7, y = 1, yend = 1,
-           size = 1.2, color = "red2", arrow = arrow())+
+           size = 1.2, color = "red2", arrow = arrow()) +
   annotate("segment", x = 2.7, xend= 2.3, y = 3, yend = 3,
-           size = 1.2, color = "red2", arrow = arrow())+
+           size = 1.2, color = "red2", arrow = arrow()) +
   theme(panel.grid.major = element_line(color = "black"),
         legend.position = "none",
         axis.text = element_blank(),
@@ -132,10 +132,10 @@ ggplot(pieMat, aes(x = pi, y = e, col = as.factor(id)))+
 ```{r PENE_sample, fig.height = 4, fig.width = 6}
 peneMat <- data.frame(id = c(1:20), ep = c(rep(1,8), rep(2,12)), en = c(rep(2,12), rep(1,8)))
 
-ggplot(peneMat, aes(x = ep, y = en, col = as.factor(id)))+
-  geom_jitter(width = 0.15, height = 0.15)+
-  scale_y_continuous(name = "nopromo",breaks = 0.5:2.5, limits = c(0.63,2.37))+
-  scale_x_continuous(name = "promo", breaks = 0.5:2.5, limits = c(0.63,2.37))+
+ggplot(peneMat, aes(x = ep, y = en, col = as.factor(id))) +
+  geom_jitter(width = 0.15, height = 0.15) +
+  scale_y_continuous(name = "nopromo",breaks = 0.5:2.5, limits = c(0.63,2.37)) +
+  scale_x_continuous(name = "promo", breaks = 0.5:2.5, limits = c(0.63,2.37)) +
   theme(panel.grid.major = element_line(color = "black"),
         legend.position = "none",
         axis.text = element_blank(),
@@ -144,13 +144,13 @@ ggplot(peneMat, aes(x = ep, y = en, col = as.factor(id)))+
 
 ## PENE matrix interpretation
 ```{r PENE_explained}
-ggplot(peneMat, aes(x = ep, y = en, col = as.factor(id)))+
-  geom_jitter(width = 0.15, height = 0.15)+
-  scale_y_continuous(name = "nopromo",breaks = 0.5:2.5, limits = c(0.63,2.37))+
-  scale_x_continuous(name = "promo", breaks = 0.5:2.5, limits = c(0.63,2.37))+
-  annotate("text", x = 2 , y = 1.7, label = "both", size = 5)+
-  annotate("text", x = 1.0 , y = 1.7, label = "everyday low", size = 5)+
-  annotate("text", x = 2 , y = 1.3, label = "high-low", size = 5)+
+ggplot(peneMat, aes(x = ep, y = en, col = as.factor(id)))  +
+  geom_jitter(width = 0.15, height = 0.15) +
+  scale_y_continuous(name = "nopromo",breaks = 0.5:2.5, limits = c(0.63,2.37)) +
+  scale_x_continuous(name = "promo", breaks = 0.5:2.5, limits = c(0.63,2.37)) +
+  annotate("text", x = 2 , y = 1.7, label = "both", size = 5) +
+  annotate("text", x = 1.0 , y = 1.7, label = "everyday low", size = 5) +
+  annotate("text", x = 2 , y = 1.3, label = "high-low", size = 5) +
   theme(panel.grid.major = element_line(color = "black"),
         legend.position = "none",
         axis.text = element_blank(),
@@ -169,29 +169,29 @@ ggplot(peneMat, aes(x = ep, y = en, col = as.factor(id)))+
 
 ## Back to model estimation
 ```{r lmer_sample}
-x <- 1 : 9
+x <- 1:9
 y <- c(3, 2, 1, 5, 4, 3, 7, 6, 5)
 z = rep(1:3,each = 3)
 mixed <- data.frame(x, y, z)
 
-ggplot(mixed, aes(x = x, y = y))+
-  geom_point(size = 3)+
-  geom_smooth(method="lm")+
-  scale_x_continuous(name = "price")+
-  scale_y_continuous(name = "quantity")+
+ggplot(mixed, aes(x = x, y = y)) +
+  geom_point(size = 3) +
+  geom_smooth(method="lm") +
+  scale_x_continuous(name = "price") +
+  scale_y_continuous(name = "quantity") +
   theme(axis.text = element_blank(),
-        axis.ticks = element_blank())+
+        axis.ticks = element_blank()) +
   annotate("text", x = 4.5, y = 7, label = paste("slope = ",lm(y~x)$coef[2]))
   
 ```
 
 ## How about segmentation?
 ```{r lmer_groups}
-ggplot(mixed, aes(x = x, y = y, col = as.factor(z)))+
-  geom_point(size = 3, color = "black")+
-  geom_smooth(method="lm")+
-  scale_x_continuous(name = "price")+
-  scale_y_continuous(name = "quantity")+
+ggplot(mixed, aes(x = x, y = y, col = as.factor(z))) +
+  geom_point(size = 3, color = "black") +
+  geom_smooth(method="lm") +
+  scale_x_continuous(name = "price") +
+  scale_y_continuous(name = "quantity") +
   theme(axis.text = element_blank(),
         axis.ticks = element_blank(),
         legend.position = "none")
@@ -211,7 +211,7 @@ ggplot(mixed, aes(x = x, y = y, col = as.factor(z)))+
     - promo segmentation
 </div>
 
-## Segmentation in model
+## Hierachy in model
 - dummy-variables
     - intercept only
 - large number of models
@@ -238,9 +238,9 @@ efR <- coef(mm)[[1]]
 
 ggplot(mixed, aes(x = x, y = y, col = as.factor(z)))+
   geom_point()+
-  geom_abline(intercept = efR[1,1], slope = efR[1,2], col = "#F8766D")+
-  geom_abline(intercept = efR[2,1], slope = efR[2,2], col = "#00BA38")+
-  geom_abline(intercept = efR[3,1], slope = efR[3,2], col = "#619CFF")+
+  geom_abline(intercept = efR[1,1], slope = efR[1,2], col = "#F8766D") +
+  geom_abline(intercept = efR[2,1], slope = efR[2,2], col = "#00BA38") +
+  geom_abline(intercept = efR[3,1], slope = efR[3,2], col = "#619CFF") +
   scale_x_continuous(name = "price")+
   scale_y_continuous(name = "quantity")+
   theme(axis.text = element_blank(),
