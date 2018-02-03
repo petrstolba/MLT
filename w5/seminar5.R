@@ -109,7 +109,6 @@ ggplot(bas, aes(x = sales)) +
 ggplot(bas[sales < 1000,], aes(x = sales)) +
     geom_histogram(binwidth = 100)
 
-
 # the lower the prices, the more the items?
 ggplot(bas, aes(x = items, y = price)) +
     geom_point() +
@@ -203,7 +202,7 @@ rownames(prodStats) <- prodStats$prod_ID
 prodStatsS <- apply(prodStats[,-1], 2, scale)
 rownames(prodStatsS) <- prodStats$prod_ID
 
-cluster <- hclust(dist(prodStatsS)^2, method = "complete")
+cluster <- hclust(dist(prodStatsS), method = "average")
 plot(cluster)
 
 res <- rep(NA, 20)
