@@ -174,8 +174,9 @@ gganimate(evoPlot)
     - no assumptions
 - for inference (prediction)
     - mostly care about homoskedasticity & outliers
-       - different error function
+        - different error function
     - cross-validation
+    - bagging / boosting
 - watch out for local optimas!
     - ABC optimisation
     
@@ -192,8 +193,10 @@ gganimate(evoPlot)
 >- similar to linear model (without the intercept)
 >- different error function
 
-<!-- DRAW PICTURE -->
-<!-- EIGEN RECAP -->
+
+## Why?
+- projections and multiplication
+- eigen - vectors & values
 
 ## Components
 - basically the unit eigenvectors of covariance matrix
