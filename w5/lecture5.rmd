@@ -190,13 +190,15 @@ gganimate(evoPlot)
     - linear combination of the original ones
 - how would you estimate that?
 
->- similar to linear model (without the intercept)
+>- similar to linear model
 >- different error function
 
+- why do we want to do this?
 
-## Why?
+## Linear Algebra
 - projections and multiplication
 - eigen - vectors & values
+
 
 ## Components
 - basically the unit eigenvectors of covariance matrix

@@ -204,17 +204,17 @@ custStatsS <- apply(custStatsS, 2, scale)
 rownames(custStatsS) <- custStats[,1]
 
 ## kmeans
-set.seed(567)
+set.seed(123)
 
 ss <- rep(NA, 20)
 for (i in 1:20) {
     ss[i] <- kmeans(custStatsS, i)$tot.withinss
 }
 plot(1:20, ss, type = "b")
-k = 5
+k = 4
 
 custStats$group <- kmeans(custStatsS, k)$cluster
-rm(custStatsS)
+cluster::clusplot(custStatsS, custStats$group, color = TRUE, shade = T, labels = 1)
 table(custStats$group)
 
 tree <- rpart(as.factor(group)~., custStats[,-1])
@@ -243,7 +243,7 @@ prodStatsS <- apply(prodStats[,-1], 2, scale)
 rownames(prodStatsS) <- prodStats$prod_ID
 
 cluster <- hclust(dist(prodStatsS), method = "average")
-plot(cluster)
+# plot(cluster)
 
 set.seed(123)
 res <- rep(NA, 20)
@@ -257,6 +257,29 @@ prodStats$group <- kmeans(prodStatsS, k)$cluster
 
 tree <- rpart(as.factor(group) ~ ., prodStats[,-1])
 fancyRpartPlot(tree)
+
+## pca
+pca <- prcomp(prodStatsS)
+biplot(pca)
+
+summary(pca)
+plot(pca, type = "l")
+
+ss <- rep(NA, 20)
+for (i in 1:20) {
+    ss[i] <- kmeans(pca$x[,1:2], i)$tot.withinss
+}
+plot(1:20, ss, type = "b")
+k = 3
+
+prodStats$group <- kmeans(pca$x[,1:3], k)$cluster
+cluster::clusplot(prodStatsS, prodStats$group, color = TRUE, shade = T, labels = 1)
+
+table(prodStats$group)
+
+tree <- rpart(as.factor(group)~., prodStats[,-1])
+fancyRpartPlot(tree)
+tree$variable.importance / sum(tree$variable.importance)
 
 ## which customers which items?
 pur[custStats[,.(cust_ID, group)], on = "cust_ID"
