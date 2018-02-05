@@ -13,10 +13,9 @@ sapply(
     require, character.only = T
 )
 
+#-- PART 1 - BASKET ANALYSIS BASICS ############################################
 
-# BASKET ANALYSIS BASICS
-
-# ETL
+#--- 1.1 ETL -------------------------------------------------------------------
 # data from https://community.tableau.com/docs/DOC-1236
 url <- "https://community.tableau.com/servlet/JiveServlet/downloadBody/1236-102-2-15278/Sample%20-%20Superstore.xls"
 dir.create("w5/data")
@@ -24,28 +23,31 @@ download.file(url, "w5/data/transac.xls", mode = "wb")
 rm(url)
 
 raw <- read_excel("w5/data/transac.xls") %>% as.data.table()
+## ID coercing
+
 str(raw)
 summary(raw)
 
-map(raw, ~length(unique(.)))
+map_dbl(raw, ~length(unique(.)))
 
 colnames(raw)
 
-# CUSTOMER TABLE
+#---- 1.1.1 TABLES SPLITTING ---------------------------------------------------
+## customer table
 cust <- raw[,.(cust_name = unique(`Customer Name`),
                segment = unique(Segment)
                ),
             by = "Customer ID"]
 setnames(cust, "Customer ID", "cust_ID")
 
-# PRODUCTS TABLE
+## products table
 prod <- raw[,.(cat = unique(Category),
                subcat = unique(`Sub-Category`),
                desc = unique(`Product Name`)),
             by = "Product ID"]
 setnames(prod, "Product ID", "prod_ID")
 
-# LOCATIONS TABLE
+## locations table
 loc <- raw[,.(city = unique(City),
               state = unique(State),
               region = unique(Region)),
@@ -53,15 +55,16 @@ loc <- raw[,.(city = unique(City),
 
 setnames(loc, "Postal Code", "zip")
 
-   ## ZIP duplicates handling
+## ZIP duplicates handling
 loc$zip %>% unique() %>% length()
+nrow(loc)
 
 loc[duplicated(loc$zip),zip] %>% 
     filter(.data = loc, zip == .)
 
 loc[zip == "92024" & city == "Encinitas", zip := 92028]
 
-# TRANSACTIONS TABLE
+## transactions table
 pur <- raw[,.(pur_ID = unique(`Order ID`),
               date = unique(`Order Date`),
               trans_mode = unique(`Ship Mode`),
@@ -73,13 +76,14 @@ pur <- raw[,.(pur_ID = unique(`Order ID`),
               promo = Discount),
            by = "Row ID"]
 
-# WHY SPLITTING?
+## WHAT IS THAT SPLITTING GOOD FOR?
+### relational databses logic...
 object.size(raw) %>% format(units = "Mb")
 
 (object.size(cust) + object.size(loc) + object.size(prod) +
     object.size(pur)) %>% format(units = "Mb")
 
-    # more realistic proportions
+### more realistic proportions
 (10 * object.size(raw)) %>% format(units = "Mb")
 
 (object.size(cust) + object.size(loc) + object.size(prod) +
@@ -87,11 +91,12 @@ object.size(raw) %>% format(units = "Mb")
 
 rm(raw)
 
-# ANALYTICS!
+#--- 1.2 EDA -------------------------------------------------------------------
 pur[,
     promoC := ifelse(promo == 0, 0, 1)
     ][,
       .(cust_ID = unique(cust_ID),
+       date = unique(date),
        sales = sum(sales),
        items = sum(items),
        price = mean(sales/items),
@@ -102,39 +107,69 @@ pur[,
       promoC := promoC/noSKU
       ] -> bas
 
-# sales histogram
+## sales histogram
 ggplot(bas, aes(x = sales)) +
     geom_histogram(binwidth = 1000)
 
 ggplot(bas[sales < 1000,], aes(x = sales)) +
     geom_histogram(binwidth = 100)
 
-
-# the lower the prices, the more the items?
+## the lower the prices, the more the items?
 ggplot(bas, aes(x = items, y = price)) +
     geom_point() +
     geom_smooth(method = "loess")
 
-# basket promo share
+## basket promo share
 ggplot(bas[order(bas$promoC),], aes(x = 1:nrow(bas), y = promoC)) +
     geom_line()
 
-# basket unique SKU
+### analyse the periodicity on nopromo baskets ####
+np_bas <-  bas[promoC == 0]                       #
+np_bas$cust_ID %>% unique %>% length              #
+                                                  #
+np_bas$cust_ID %>%                                #
+    table %>%                                     #
+    as.data.frame() %>%                           #
+    {.[order(.$Freq, decreasing = T),]} %>%       #
+    View()                                        #
+rm(np_bas)                                        #
+### nothing to analyse :D #########################
+
+## basket unique SKU
 ggplot(bas[order(bas$noSKU),], aes(x = 1:nrow(bas), y = noSKU)) +
     geom_line()
 
-# relation between unique SKU and number of items bought
+## relation between unique SKU and number of items bought
 ggplot(bas, aes(x = noSKU, y = items)) +
-    geom_point()
-    # BAD IDEA!
+    geom_point() +
+    geom_smooth(method = "lm")
+    ## BAD IDEA!
 
 ggplot(bas, aes(x = as.factor(noSKU), y = items)) +
     geom_boxplot()
 
 ggplot(bas, aes(x = noSKU, y = items)) +
-    geom_jitter()
+    geom_jitter(width = 0.5, height = 0.6)
 
-# customer segmentation
+## daily visits
+bas[,
+    day := format(date,"%u")
+    ][,
+      promoG := ifelse(promoC > 0.5, 1, 0)
+    ][,
+      .(visits = .N),
+      by = .(day, promoG)
+    ] -> daily
+
+ggplot(daily, aes(x = day, y = visits, col = as.factor(promoG),
+                  group = as.factor(promoG))) +
+    geom_line() +
+    geom_point()
+
+#-- PART 2 - SEGMENTATIONS #####################################################
+
+#--- 2.1 CUSTOMERS -------------------------------------------------------------
+## feature engineering
 pur[,
     .(unSKU = length(unique(prod_ID)),
       itemsSKU = mean(items),
@@ -153,6 +188,7 @@ custStats[basStats, on = "cust_ID"
           ][cust[,.(cust_ID, segment)],, on = "cust_ID"] -> custStats
 rm(basStats)
 
+## dummies
 custStats$segment %>% unique
 
 custStats %<>% 
@@ -160,31 +196,32 @@ custStats %<>%
     mutate(HO = ifelse(segment == "Home Office", 1, 0)) %>% 
     select(-segment)
 
+## into matrix and scale
 custStats %>% summary()
     
 custStatsS <- custStats[,-1]
-rownames(custStatsS) <- custStats[,1]
 custStatsS <- apply(custStatsS, 2, scale)
+rownames(custStatsS) <- custStats[,1]
 
-set.seed(567)
+## kmeans
+set.seed(123)
+
 ss <- rep(NA, 20)
 for (i in 1:20) {
     ss[i] <- kmeans(custStatsS, i)$tot.withinss
 }
 plot(1:20, ss, type = "b")
-k = 5
+k = 4
 
 custStats$group <- kmeans(custStatsS, k)$cluster
-rm(custStatsS)
+cluster::clusplot(custStatsS, custStats$group, color = TRUE, shade = T, labels = 1)
 table(custStats$group)
 
 tree <- rpart(as.factor(group)~., custStats[,-1])
 fancyRpartPlot(tree)
 
-custStats$cust_ID <- rownames(custStats)
-cust <- cust[custStats, on = "cust_ID"]
-
-# product segmentation
+#--- 2.1 PRODUCTS --------------------------------------------------------------
+## feature engineering
 pur[,
     .(custPen = length(unique(cust_ID))/nrow(cust),
       basPen = length(unique(pur_ID))/nrow(bas),
@@ -193,19 +230,22 @@ pur[,
       promo = mean(promo)),
     by = "prod_ID"] -> prodStats
 
+## dummies
+prod$cat %>% table
 prodStats[prod[,.(prod_ID, cat)], on = "prod_ID"
           ][,furn := ifelse(cat == "Furniture", 1, 0)
             ][,tech := ifelse(cat == "Technology", 1, 0)
               ][!duplicated(prod_ID), !"cat"] -> prodStats
 
+## matrix and scale
 rownames(prodStats) <- prodStats$prod_ID
-
 prodStatsS <- apply(prodStats[,-1], 2, scale)
 rownames(prodStatsS) <- prodStats$prod_ID
 
-cluster <- hclust(dist(prodStatsS)^2, method = "complete")
-plot(cluster)
+cluster <- hclust(dist(prodStatsS), method = "average")
+# plot(cluster)
 
+set.seed(123)
 res <- rep(NA, 20)
 for (i in 1:20) {
     res[i] <- kmeans(prodStatsS, i)$tot.withinss
@@ -218,8 +258,31 @@ prodStats$group <- kmeans(prodStatsS, k)$cluster
 tree <- rpart(as.factor(group) ~ ., prodStats[,-1])
 fancyRpartPlot(tree)
 
-# which customers which items?
-pur[cust[,.(cust_ID, group)], on = "cust_ID"
+## pca
+pca <- prcomp(prodStatsS)
+biplot(pca)
+
+summary(pca)
+plot(pca, type = "l")
+
+ss <- rep(NA, 20)
+for (i in 1:20) {
+    ss[i] <- kmeans(pca$x[,1:2], i)$tot.withinss
+}
+plot(1:20, ss, type = "b")
+k = 3
+
+prodStats$group <- kmeans(pca$x[,1:3], k)$cluster
+cluster::clusplot(prodStatsS, prodStats$group, color = TRUE, shade = T, labels = 1)
+
+table(prodStats$group)
+
+tree <- rpart(as.factor(group)~., prodStats[,-1])
+fancyRpartPlot(tree)
+tree$variable.importance / sum(tree$variable.importance)
+
+## which customers which items?
+pur[custStats[,.(cust_ID, group)], on = "cust_ID"
     ][prodStats[,.(prod_ID, group)], on = "prod_ID"] -> purGrp
 
 setnames(purGrp, c("group", "i.group"), c("custG", "prodG"))
