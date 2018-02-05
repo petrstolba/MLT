@@ -35,8 +35,8 @@ set.seed(123)
 
 ## 
 - definition
-- mixed data
 - Euclidean
+- mixed data
 - Gower
 
 # Clustering introduction

@@ -126,7 +126,7 @@ clusplot(wholeC, kModel$cluster, color = TRUE, shade = T, labels = 1)
 wholeMat <- dist(wholeC[,-1:-2])
 
 # complete with squared distances!
-hModel <- hclust(wholeMat^2, method = "complete")
+hModel <- hclust(wholeMat, method = "complete")
 plot(hModel)
 
 ## find the longest line
