@@ -211,7 +211,7 @@ for (i in 1:20) {
     ss[i] <- kmeans(custStatsS, i)$tot.withinss
 }
 plot(1:20, ss, type = "b")
-k = 4
+k = 3
 
 custStats$group <- kmeans(custStatsS, k)$cluster
 cluster::clusplot(custStatsS, custStats$group, color = TRUE, shade = T, labels = 1)
@@ -263,7 +263,8 @@ pca <- prcomp(prodStatsS)
 biplot(pca)
 
 summary(pca)
-plot(pca, type = "l")
+
+plot(1/summary(pca)$importance[3,], type = "b")
 
 ss <- rep(NA, 20)
 for (i in 1:20) {
@@ -272,7 +273,7 @@ for (i in 1:20) {
 plot(1:20, ss, type = "b")
 k = 3
 
-prodStats$group <- kmeans(pca$x[,1:3], k)$cluster
+prodStats$group <- kmeans(pca$x[,1:2], k)$cluster
 cluster::clusplot(prodStatsS, prodStats$group, color = TRUE, shade = T, labels = 1)
 
 table(prodStats$group)
@@ -282,6 +283,7 @@ fancyRpartPlot(tree)
 tree$variable.importance / sum(tree$variable.importance)
 
 ## which customers which items?
+custStats %<>% as.data.table() 
 pur[custStats[,.(cust_ID, group)], on = "cust_ID"
     ][prodStats[,.(prod_ID, group)], on = "prod_ID"] -> purGrp
 
