@@ -1,0 +1,134 @@
+---
+title: "Lecture 7"
+author: "Michal Kubi&#353;ta"
+date: "26 February 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
+                      cache = TRUE, fig.align = 'center',
+                      fig.width = 8, fig.height = 5)
+library(magrittr)
+library(ggplot2)
+library(rpart)
+library(rattle)
+library(gridExtra)
+```
+
+## Structure
+1.) Decission trees
+2.) Customer churn
+3.) Boosting and Bagging
+4.) Random forests
+
+# Decission trees
+
+## Introduction to decission rules
+- if-else conditions used to split data
+- aimed at increasing "purity"
+    - InfoGain / Gini
+    - decrease of variation
+- if build hierarchically, they form a tree
+
+## Trees
+- classification & regression
+- very greedy
+    - always optimising on one variable only!
+- more flexible than linear models
+    - can easily handle non-linear relations
+    - automatic variable selection
+- can't predict out of scope of the input data
+    - can't be used for time series (on their own)
+
+## Tree types
+- rpart
+    - recursive partitioning
+    - both classification / regression
+    - Gini 
+- C.5
+    - only classification
+    - InfoGain
+    
+## Example trees
+
+<div class="columns-2">
+```{r tree_example_num, fig.align='left', fig.width=4}
+rpart(gear ~ ., mtcars) %>% fancyRpartPlot()
+```
+
+```{r tree_example_fac, fig.align='right', fig.width=4}
+rpart(as.factor(gear) ~ ., mtcars) %>% fancyRpartPlot()
+```
+</div>
+
+## Summary
+- rpart::rpart
+- C5O::C5.0.default
+- handle complex relations well
+- automatic variable selection
+    - good for large datasets
+- very greedy
+- unstable
+    - bad for small datasets
+
+# Customer churn
+
+## What is churn?
+- customer attrition
+- loss of clients
+- targetted mostly by
+    - banks, insurance companies
+    - telcom, intenet, TV providers
+- mostly service companies
+- cheeper to retain customers than to find new ones
+
+## Much ado churn?
+- Why do those companies care so much?
+    - customers ~ free money
+- financial institutions
+    - you keep your customers money
+- communication & TV
+    - customer pays every month
+- service providers with high initial (fixed) costs and very low variable costs
+    - how much are the actuall costs of transfering 1 GB of data?
+    - how much are the costs of providing insurance to customer?
+
+# Boosting & Bagging
+
+## Boosting
+- ensembling a large number of week learners (models) into one strong
+- linear
+    - first model
+    - second is trained on residuals of the first
+    - third is trained on the residuals (of residuals) of the second model
+- subsetting observations
+    - more weight to missclasiffied ones
+- increasing accuracy
+    - prone to overfitting
+
+## Bagging
+- ensembling a large number of week learners (models) into one strong
+- in parallel
+    - independent models
+- subsetting observations and variables
+    - observations sampled with repetitions
+        - one original observation can be used more than one time in each of the models
+- increasing stability
+
+# Random forests
+
+## Welcome to the forest
+- bagging algorithm
+- build from trees
+- good accuracy and stability
+
+>- black box
+
+## Opening the black box
+- var imp
+- forestfloor
+- predictions
+
