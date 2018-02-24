@@ -19,60 +19,10 @@ library(gridExtra)
 ```
 
 ## Structure
-1.) Decission trees
-2.) Customer churn
-3.) Boosting and Bagging
-4.) Random forests
-
-# Decission trees
-
-## Introduction to decission rules
-- if-else conditions used to split data
-- aimed at increasing "purity"
-    - InfoGain / Gini
-    - decrease of variation
-- if build hierarchically, they form a tree
-
-## Trees
-- classification & regression
-- very greedy
-    - always optimising on one variable only!
-- more flexible than linear models
-    - can easily handle non-linear relations
-    - automatic variable selection
-- can't predict out of scope of the input data
-    - can't be used for time series (on their own)
-
-## Tree types
-- rpart
-    - recursive partitioning
-    - both classification / regression
-    - Gini 
-- C.5
-    - only classification
-    - InfoGain
-    
-## Example trees
-
-<div class="columns-2">
-```{r tree_example_num, fig.align='left', fig.width=4}
-rpart(gear ~ ., mtcars) %>% fancyRpartPlot()
-```
-
-```{r tree_example_fac, fig.align='right', fig.width=4}
-rpart(as.factor(gear) ~ ., mtcars) %>% fancyRpartPlot()
-```
-</div>
-
-## Summary
-- rpart::rpart
-- C5O::C5.0.default
-- handle complex relations well
-- automatic variable selection
-    - good for large datasets
-- very greedy
-- unstable
-    - bad for small datasets
+1.) Customer churn  
+2.) Decission trees  
+3.) Boosting and Bagging  
+4.) Random forests  
 
 # Customer churn
 
@@ -95,6 +45,147 @@ rpart(as.factor(gear) ~ ., mtcars) %>% fancyRpartPlot()
 - service providers with high initial (fixed) costs and very low variable costs
     - how much are the actuall costs of transfering 1 GB of data?
     - how much are the costs of providing insurance to customer?
+    
+## Churn types
+- explicit (contractual) vs. implicit (non-contractual)
+- voluntary (pro-active) vs. involuntary (reactive)
+- happy churn
+- fake churn
+
+# Decission trees
+
+## Introduction to decission rules
+- if-else conditions used to split data
+- aimed at increasing "purity"
+    - InfoGain / Gini
+    - decrease of variation
+- if build hierarchically, they form a tree
+
+## Tree types
+- rpart
+    - recursive partitioning
+    - both classification / regression
+    - Gini 
+- C.5
+    - only classification
+    - InfoGain
+- CHAID
+- MARS
+
+## Gini coefficient
+- first we label the observation randomly
+    - with regard to the original proportions in the data
+- we choose observation randomly
+- what is the probability it is correctly classified?
+
+$$G(p) = \sum_{i=1}^{J}p_{i} \sum_{k \neq i}p_{k} = \sum_{i=1}^{J}p_{i}*(1-p_{i}) = \sum_{i=1}^{J}p_{i} - \sum_{i=1}^{J}p_{i}^{2}$$
+
+## Entropy function
+
+```{r entropy, echo = FALSE}
+ex = seq(0.05, 0.95, by = 0.05)
+ey = -ex * log(ex, 2) - (1 - ex) * log(1 - ex, 2)
+en = data.frame(ex,ey)
+ggplot(en, aes(ex,ey)) +
+    geom_point(size = 2) +
+    geom_line() +
+    scale_x_continuous(limits = c(0,1), breaks = seq(0,1, by = 0.25))
+    
+```
+
+## Entropy & InfoGain
+- information entropy
+
+$$E = -\sum_{i=1}^{J}p_{i}log_{2}p_{i}$$
+
+- information gain
+
+$$IG_{k} = E_{k-1} - \sum_{s}^{S}\frac{n_{s}}{n}E_{s}$$
+
+## MARS
+
+```{r MARS_prepare, echo = F}
+set.seed(12345)
+mx = 1:20
+my = c(2 * mx[1:10] + rnorm(10), 5 * mx[11:20] + rnorm(10) - 33)
+my2 = c(2 * mx[1:11], rep(0, 9))
+my3 = c(rep(0,10), 5 * mx[11:20] - 33)
+mars = data.frame(mx,my, my2, my3)
+
+ggplot(mars, aes(mx,my)) +
+    geom_point(size = 2)
+
+
+```
+
+## MARS - linear model
+
+```{r MARS_lm}
+
+ggplot(mars, aes(mx,my)) +
+    geom_point(size = 2) +
+    geom_smooth(method = "lm", se = F, aes(col = "lm"))
+
+
+```
+
+## MARS - mars model
+
+```{r MARS_mars}
+ggplot(mars, aes(mx,my)) +
+    geom_point(size = 2) +
+    geom_smooth(method = "lm", se = F, aes(col = "lm")) +
+    geom_line(data = mars[1:11,], aes(mx, my2, col = "mars1"), size = 1) +
+    geom_line(data = mars[11:20,], aes(mx, my3, col = "mars2"), size = 1)
+
+
+```
+
+## MARS
+- multivariate adaptive regression splines
+- fitting several linear models
+
+$$\hat y = 22 - 2 * max(0, 11 - x) + 5 * max(0, x-11)$$
+
+$$\hat f(x) = \sum_{i}^{k} c_{i}B_{i}(x)$$
+
+- basis function $B_{i}(x)$  
+    - constant $1$
+    - hinge function ($max(0, x - const)$ or $max(0, const - x)$)
+    - product of hinge functions
+
+## Trees
+- classification & regression
+- very greedy
+    - always optimising on one variable only!
+- more flexible than linear models
+    - can easily handle non-linear relations
+    - automatic variable selection
+- can't predict out of scope of the input data
+    - can't be used for time series (on their own)
+
+## Example trees
+
+<div class="columns-2">
+```{r tree_example_num, fig.align='left', fig.width=4}
+rpart(gear ~ ., mtcars) %>% fancyRpartPlot()
+```
+
+```{r tree_example_fac, fig.align='right', fig.width=4}
+rpart(as.factor(gear) ~ ., mtcars) %>% fancyRpartPlot()
+```
+</div>
+
+## Summary
+- rpart::rpart
+- C5O::C5.0.default
+- mda::mars
+- handle complex relations well
+- automatic variable selection
+    - good for large datasets
+- very greedy
+- unstable
+    - insufficient for small datasets
 
 # Boosting & Bagging
 
