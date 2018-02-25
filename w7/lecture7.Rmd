@@ -16,6 +16,10 @@ library(ggplot2)
 library(rpart)
 library(rattle)
 library(gridExtra)
+library(randomForest)
+library(forestFloor)
+library(inTrees)
+library(mlbench)
 ```
 
 ## Structure
@@ -219,7 +223,63 @@ rpart(as.factor(gear) ~ ., mtcars) %>% fancyRpartPlot()
 >- black box
 
 ## Opening the black box
-- var imp
-- forestfloor
+- variable importance
+
+```{r rf_varimp, echo = FALSE}
+a = data("PimaIndiansDiabetes")
+rf = randomForest(glucose ~ ., PimaIndiansDiabetes[,-9] , importance = T, keep.inbag = T)
+
+varImpPlot(rf, type = 1)
+```
+
+## Opening the black box
 - predictions
 
+```{r rf_predict, echo = FALSE}
+xmeans = apply(PimaIndiansDiabetes[,c(1,3:8)], 2, mean)
+
+input = as.data.frame(matrix(xmeans, nrow = 200, ncol = 7, byrow = T))
+colnames(input) = names(xmeans)
+
+ins = input
+ins$insulin = seq(0, 846 , length.out = 200)
+
+tric = input
+tric$triceps = seq(0, 99, length.out = 200)
+
+age = input
+age$age = seq(21, 81, length.out = 200)
+
+par(mfrow = c(2,2))
+plot(x = ins$insulin, y = predict(rf, ins), type = "l", xlab = "insulin", ylab = "glucose")
+plot(x = tric$triceps, y = predict(rf, tric), type = "l", xlab = "triceps", ylab = "glucose")
+plot(x = age$age, y = predict(rf, age), type = "l", xlab = "age", ylab = "glucose")
+
+```
+
+## Opening the black box
+- forestFloor
+```{r rf_floor, message=FALSE, echo=FALSE, fig.height = 4}
+ff <- forestFloor(rf, PimaIndiansDiabetes, calc_np = T)
+Col <- fcol(ff, cols = 2, outlier.lim = 2.5)
+plot(ff, col = Col, plot_seq = 1:6)
+```
+
+## Opening the black box
+- inTrees
+
+```{r rf_intrees_prep, include = FALSE}
+ruleExec0 = extractRules(RF2List(rf), PimaIndiansDiabetes) 
+ruleExec = unique(ruleExec0)
+ruleMetric = getRuleMetric(ruleExec,PimaIndiansDiabetes,PimaIndiansDiabetes$glucose) # regression rules
+
+ruleMetric = pruneRule(ruleMetric, PimaIndiansDiabetes, PimaIndiansDiabetes$glucose)
+
+metrics = as.data.frame(ruleMetric[1:5,])
+metrics[,c(1:3,5)] = apply(metrics[,c(1:3,5)], 2, as.numeric)
+metrics[,c(2:3,5)] = apply(metrics[,c(2:3,5)], 2, round, 2)
+```
+
+```{r rf_intrees_plot}
+knitr::kable(metrics)
+```
