@@ -42,7 +42,7 @@ rm(index)
 ## simple tree
 tree = rpart(Churn ~ ., train[,-1])
 fancyRpartPlot(tree)
-tree$cptable
+
 tree$variable.importance
 summary(tree)
 
@@ -94,7 +94,7 @@ varImpPlot(rf)
 rf$confusion
 sum(rf$predicted == train$Churn)/nrow(train)
 
-## tet performance
+## test performance
 test$pred = predict(rf, test[,-1])
 sum(test$pred == test$Churn)/nrow(test)
 table(true = test$Churn, pred = test$pred)
@@ -122,7 +122,7 @@ errors
 which.max(errors)
 
 ## "best" forest visualisation
-rf = randomForest(Churn ~ ., train[,-1], mtry = 4, importance = TRUE,
+rf = randomForest(Churn ~ ., train[,-1], mtry = 2, importance = TRUE,
                   keep.inbag = T, ntrees = 2000)
 rf$importance
 
