@@ -1,0 +1,119 @@
+---
+title: "Lecture 8"
+author: "Michal Kubi&#353;ta"
+date: "5 March 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+    
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
+                      cache = TRUE, fig.align = 'center',
+                      fig.width = 8, fig.height = 5)
+library(magrittr)
+library(ggplot2)
+library(readxl)
+library(data.table)
+library(ggridges)
+library(RColorBrewer)
+library(corrplot)
+path = rprojroot::find_rstudio_root_file()
+raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
+```
+
+## Structure
+1. Visualizations
+2. Reporting methods
+
+# Visualization
+
+## Boxplot
+
+```{r boxplot}
+ggplot(raw, aes(x = Category, y = Discount, group = Category,
+                fill = Category)) +
+           geom_boxplot()
+```
+
+## Violin plot
+
+```{r violin}
+ggplot(raw, aes(x = Category, y = Discount,
+                group = Category,
+                fill = Category)
+       ) +
+    geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))
+
+```
+
+## Ridge plots
+
+```{r ridge, message=FALSE}
+ggplot(raw, aes(x = Discount, y = Category, fill = Category)) +
+  geom_density_ridges() +
+    theme_ridges() 
+```
+
+## Corplot
+
+```{r corrplot}
+cor_mat = cor(raw[,.(Sales, Quantity, Discount)])
+corrplot::corrplot.mixed(cor_mat, lower.col = "black",
+                         upper = "ellipse")
+```
+
+## Contour
+
+```{r contour}
+ggplot(raw, aes(x = Quantity, y = Discount)) +
+  geom_density_2d()
+```
+
+## Barplot
+
+```{r bar}
+ggplot(raw, aes(x = `Sub-Category`, y = Quantity,
+                fill = `Sub-Category`)) +
+    geom_col()
+```
+
+## Circular barplot!
+
+```{r cir_bar}
+ggplot(raw, aes(x = `Sub-Category`, y = Sales,
+                fill = `Sub-Category`)) +
+    geom_col() +
+    coord_polar() + 
+    theme(legend.position = "none")
+```
+
+## Spider / Radar
+
+## treemap
+
+## circle packing
+
+## Heatmap
+
+## Wordcloud
+
+## connection (chord)
+
+## animations
+
+## 3D
+
+## MAPS
+- ggmaps
+- tmaps (shapefiles)
+- leaflet
+
+# Reporting
+
+## RMD - html
+## Xaringan
+## RMD - pdf
+## Sweave
+## Shiny
+## Interactive documents
