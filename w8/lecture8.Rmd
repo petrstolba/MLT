@@ -18,6 +18,10 @@ library(data.table)
 library(ggridges)
 library(RColorBrewer)
 library(corrplot)
+library(treemap)
+library(wordcloud)
+library(circlize)
+
 path = rprojroot::find_rstudio_root_file()
 raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
 ```
@@ -88,17 +92,44 @@ ggplot(raw, aes(x = `Sub-Category`, y = Sales,
     theme(legend.position = "none")
 ```
 
-## Spider / Radar
-
 ## treemap
 
-## circle packing
+```{r treemap}
+treemap::treemap(raw, c("Category", "Sub-Category"), vSize = "Quantity")
+```
 
-## Heatmap
+## heatmap
 
-## Wordcloud
+```{r heatmap}
+sales_mat = raw[,
+                .(sales = sum(Sales),
+                  qty = sum(Quantity),
+                  disc = mean(Discount)),
+                by = "Sub-Category"]
+rn = sales_mat$`Sub-Category`
+sales_mat = as.matrix(sales_mat[,-1]) %>% scale()
+rownames(sales_mat) = rn
+
+heatmap(sales_mat, col = RColorBrewer::brewer.pal(9,"OrRd"))
+```
+
+## wordcloud
+
+```{r wordcloud}
+
+words = raw[,.(freq = .N, sales = sum(Sales)), by = City]
+wordcloud(words$City, freq =  words$freq, min.freq = 20)
+```
 
 ## connection (chord)
+
+```{r chord}
+cat_sum = raw[,sum(Sales), by = "Category"]
+circlize::circos.initialize(cat_sum$Category, x = 2:5)
+
+raw[,sum(Sales), by = "Category"]
+
+```
 
 ## animations
 
