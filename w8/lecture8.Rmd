@@ -21,6 +21,7 @@ library(corrplot)
 library(treemap)
 library(wordcloud)
 library(circlize)
+library(gganimate)
 
 path = rprojroot::find_rstudio_root_file()
 raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
@@ -32,7 +33,7 @@ raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
 
 # Visualization
 
-## Boxplot
+## boxplot
 
 ```{r boxplot}
 ggplot(raw, aes(x = Category, y = Discount, group = Category,
@@ -40,7 +41,7 @@ ggplot(raw, aes(x = Category, y = Discount, group = Category,
            geom_boxplot()
 ```
 
-## Violin plot
+## violin plot
 
 ```{r violin}
 ggplot(raw, aes(x = Category, y = Discount,
@@ -51,7 +52,7 @@ ggplot(raw, aes(x = Category, y = Discount,
 
 ```
 
-## Ridge plots
+## ridge plots
 
 ```{r ridge, message=FALSE}
 ggplot(raw, aes(x = Discount, y = Category, fill = Category)) +
@@ -59,7 +60,7 @@ ggplot(raw, aes(x = Discount, y = Category, fill = Category)) +
     theme_ridges() 
 ```
 
-## Corplot
+## corplot
 
 ```{r corrplot}
 cor_mat = cor(raw[,.(Sales, Quantity, Discount)])
@@ -67,14 +68,14 @@ corrplot::corrplot.mixed(cor_mat, lower.col = "black",
                          upper = "ellipse")
 ```
 
-## Contour
+## contour
 
 ```{r contour}
 ggplot(raw, aes(x = Quantity, y = Discount)) +
   geom_density_2d()
 ```
 
-## Barplot
+## barplot
 
 ```{r bar}
 ggplot(raw, aes(x = `Sub-Category`, y = Quantity,
@@ -82,7 +83,7 @@ ggplot(raw, aes(x = `Sub-Category`, y = Quantity,
     geom_col()
 ```
 
-## Circular barplot!
+## circular barplot!
 
 ```{r cir_bar}
 ggplot(raw, aes(x = `Sub-Category`, y = Sales,
@@ -124,16 +125,40 @@ wordcloud(words$City, freq =  words$freq, min.freq = 20)
 ## connection (chord)
 
 ```{r chord}
-cat_sum = raw[,sum(Sales), by = "Category"]
-circlize::circos.initialize(cat_sum$Category, x = 2:5)
+cat_sum = raw[,.(category = unique(Category)), by = "Customer ID"][,val := 1]
+cat_sum = dcast(cat_sum, `Customer ID` ~ category, value.var = "val", fill = 0)
+cat_sum = as.matrix(cat_sum[,-1])
+cat_sum = t(cat_sum) %*% cat_sum
+cat_sum[lower.tri(cat_sum)] = 0
 
-raw[,sum(Sales), by = "Category"]
+base_col = RColorBrewer::brewer.pal(3, "Set1")
+
+circlize::chordDiagram(cat_sum,
+                       grid.col = base_col,
+                       grid.border = "black",
+                       directional = 1,
+                       direction.type = "arrows",
+                       self.link = 1)
 
 ```
 
 ## animations
 
-## 3D
+```{r anim, fig.show='animate', warning=FALSE}
+daily = raw[, date := as.Date(raw$`Order Date`)
+            ][,month := as.numeric(format(date, "%m"))
+              ][,year := format(date, "%Y")
+                ][,.(sales = sum(Sales)), by = c("month", "year", "Category")
+                  ]
+
+p = ggplot(daily,
+           aes(x = month, y = sales, group = Category, col = Category, frame = year)) +
+    geom_line(position = "identity")
+
+gganimate::gganimate(p)
+
+```
+
 
 ## MAPS
 - ggmaps
