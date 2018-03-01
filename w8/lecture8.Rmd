@@ -187,9 +187,12 @@ obce = RCzechia::obce_body
 
 tmap::tm_shape(kraje) +
     tm_polygons(col = "NAZ_CZNUTS3") +
+    
     tm_shape(obce) +
     tm_bubbles(size = 0.01) +
+    
     tm_legend(scale = 0.7)
+    
 ```
 
 ## leaflet
