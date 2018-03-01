@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
                       fig.width = 8, fig.height = 5)
 library(magrittr)
 library(ggplot2)
-library(readxl)
+library(readxl) 
 library(data.table)
 library(ggridges)
 library(RColorBrewer)
@@ -22,6 +22,10 @@ library(treemap)
 library(wordcloud)
 library(circlize)
 library(gganimate)
+library(ggmap)
+library(RCzechia)
+library(sf)
+library(tmap)
 
 path = rprojroot::find_rstudio_root_file()
 raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
@@ -29,7 +33,8 @@ raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
 
 ## Structure
 1. Visualizations
-2. Reporting methods
+2. Maps
+3. Reporting methods
 
 # Visualization
 
@@ -160,10 +165,34 @@ gganimate::gganimate(p)
 ```
 
 
-## MAPS
-- ggmaps
-- tmaps (shapefiles)
-- leaflet
+# Maps
+
+## ggmaps
+
+```{r ggmap, message=FALSE}
+CZ = ggmap::get_map("Czech Republic", zoom = 7, maptype = "hybrid")
+
+cities = c("Prague","Brno","Jihlava")
+cities = cbind(cities, ggmap::geocode(c("Prague","Brno","Jihlava")))
+
+ggmap::ggmap(CZ) +
+    geom_point(data = cities, col = "red", size = 2, shape = 4, stroke = 2)
+```
+
+## tmaps
+
+```{r  sf}
+kraje = RCzechia::kraje
+obce = RCzechia::obce_body
+
+tmap::tm_shape(kraje) +
+    tm_polygons(col = "NAZ_CZNUTS3") +
+    tm_shape(obce) +
+    tm_bubbles(size = 0.01) +
+    tm_legend(scale = 0.7)
+```
+
+## leaflet
 
 # Reporting
 
