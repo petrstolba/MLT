@@ -171,19 +171,91 @@
 
 </article></slide><slide class=""><hgroup><h2>leaflet</h2></hgroup><article  id="leaflet">
 
+<iframe title="Leaflet Map" width="980" height="400" src="map.html" frameborder="0" allowfullscreen>
+
+</iframe>
+
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Reporting</h2></hgroup><article  id="reporting">
 
-</article></slide><slide class=""><hgroup><h2>RMD - html</h2></hgroup><article  id="rmd---html">
+</article></slide><slide class=""><hgroup><h2>markdown</h2></hgroup><article  id="markdown">
+
+<ul>
+<li>simple mark-up syntax (simpler than html or latex)</li>
+<li>originally designed for documentation</li>
+</ul>
+
+<h2>
+
+Rmarkdown = markdown &amp; R integration
+
+</h2>
+
+<ul>
+<li>you can simply include tables / plots / other inputs into the output
+
+<ul>
+<li>R chunks</li>
+</ul></li>
+<li>reproducibility</li>
+<li>can be used for documents and presentations
+
+<ul>
+<li>ioslides, Slidy, Beamer (pdf)</li>
+</ul></li>
+<li>for html output
+
+<ul>
+<li>markdown is actually compiled into html</li>
+<li>you can embeed html tags, CSS, even javascript code</li>
+</ul></li>
+<li>Sweave as pdf alternative</li>
+</ul>
 
 </article></slide><slide class=""><hgroup><h2>Xaringan</h2></hgroup><article  id="xaringan">
 
-</article></slide><slide class=""><hgroup><h2>RMD - pdf</h2></hgroup><article  id="rmd---pdf">
+<ul>
+<li>R package</li>
+<li>presentations (not documents)</li>
+<li>based on Rmarkdown / remarkjs</li>
+<li>more configurable while still being very simple
 
-</article></slide><slide class=""><hgroup><h2>Sweave</h2></hgroup><article  id="sweave">
+<ul>
+<li>several features are made ven more simple (compared to Slidy / ioslides)
+
+<ul>
+<li>e.g. incrementality</li>
+</ul></li>
+</ul></li>
+</ul>
 
 </article></slide><slide class=""><hgroup><h2>Shiny</h2></hgroup><article  id="shiny">
 
-</article></slide><slide class=""><hgroup><h2>Interactive documents</h2></hgroup><article  id="interactive-documents"></article></slide>
+<ul>
+<li>R package</li>
+<li>allows creation of web-based applications
+
+<ul>
+<li>interactive visualisations and reporting</li>
+</ul></li>
+<li>compiles R code into a javascript
+
+<ul>
+<li>special functions used to get around actual html tags and js code</li>
+<li>html, CSS and javascript can be used to augment the applications</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Interactive documents</h2></hgroup><article  id="interactive-documents">
+
+<ul>
+<li>the ultimate combination</li>
+<li>Rmarkdown document, but
+
+<ul>
+<li>chunks are not just simple R</li>
+<li>they are connections to the Shiny application</li>
+</ul></li>
+</ul></article></slide>
 
 
   <slide class="backdrop"></slide>

@@ -26,6 +26,7 @@ library(ggmap)
 library(RCzechia)
 library(sf)
 library(tmap)
+library(leaflet)
 
 path = rprojroot::find_rstudio_root_file()
 raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
@@ -164,7 +165,6 @@ gganimate::gganimate(p)
 
 ```
 
-
 # Maps
 
 ## ggmaps
@@ -197,11 +197,65 @@ tmap::tm_shape(kraje) +
 
 ## leaflet
 
+```{r leaflet}
+
+content <- paste(sep = "<br/>",
+  "<b><a href='https://www.cerge-ei.cz/'>CERGE-EI</a></b>",
+  "Politickych veznu 7",
+  "Prague 1, Czech Republic"
+)
+
+map_leaf = 
+    leaflet() %>%                                            # Just these
+    setView(14.44, 50.076, zoom = 12) %>%                    # lines should
+    addProviderTiles(providers$OpenStreetMap) %>%            # be enough to
+    addPopups(14.429, 50.083, content,                       # render the
+              options = popupOptions(closeButton = TRUE))    # map widget
+    
+htmlwidgets::saveWidget(map_leaf, "map.html", selfcontained = TRUE)
+# No need to assign, saveWidget and use iframe (bellow)
+# But it is more stable and more fancy (I have more control) solution
+
+```
+
+<iframe  title= "Leaflet Map" width="980" height="400" src="map.html" frameborder="0" allowfullscreen></iframe>
+
 # Reporting
 
-## RMD - html
+## markdown
+- simple mark-up syntax (simpler than html or latex)
+- originally designed for documentation
+
+<h2>Rmarkdown = markdown & R integration</h2>
+
+- you can simply include tables / plots / other inputs into the output
+    - R chunks
+- reproducibility
+- can be used for documents and presentations
+    - ioslides, Slidy, Beamer (pdf)
+- for html output
+    - markdown is actually compiled into html
+    - you can embeed html tags, CSS, even javascript code
+- Sweave as pdf alternative
+
 ## Xaringan
-## RMD - pdf
-## Sweave
+- R package
+- presentations (not documents)
+- based on Rmarkdown / remarkjs
+- more configurable while still being very simple
+    - several features are made ven more simple (compared to Slidy / ioslides)
+        - e.g. incrementality
+
 ## Shiny
+- R package
+- allows creation of web-based applications
+    - interactive visualisations and reporting
+- compiles R code into a javascript
+    - special functions used to get around actual html tags and js code
+    - html, CSS and javascript can be used to augment the applications
+
 ## Interactive documents
+- the ultimate combination
+- Rmarkdown document, but
+    - chunks are not just simple R
+    - they are connections to the Shiny application
