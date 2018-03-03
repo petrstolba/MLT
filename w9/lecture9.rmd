@@ -1,0 +1,74 @@
+---
+title: "Lecture 9"
+author: "Michal Kubi&#353;ta"
+date: "12 March 2018"
+output:
+  ioslides_presentation:
+    widescreen: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "mp4",
+                      cache = TRUE, fig.align = 'center',
+                      fig.width = 8, fig.height = 5)
+```
+
+## Structure
+1. Neural networks
+2. SOM
+3. Recap
+
+# Neural networks
+
+## Basics
+- aritificial neural networks, deep learning, AI
+- basically a whole new field
+    - statistics **|** machine learning **|** deep learnings
+- basic terminology
+    - neuron
+    - input, weights, activation function
+    - layers
+        - input, hidden, output
+- similar to linear regression
+    - master of feature engineering (... PCA)
+    
+## Types
+
+<img src="www/nnzoo.png" height = 500 align="right">
+
+- compiled by [Azimov Institute](http://www.asimovinstitute.org/neural-network-zoo/)
+- many different types
+- differ composition on neurons
+</br>
+</br>
+- different preprocessing methods
+- different activation functions
+
+## Estimation
+
+## Preprocessing
+- convolution
+
+## Summary
+
+
+# SOM
+
+## Overview
+
+## Estimation
+
+## Summary
+
+
+# Recap
+
+## Git
+
+## Tables and distances
+
+## Regularization - LASSO
+
+## MLE
+
+## Bagging & Boosting
