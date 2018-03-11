@@ -32,7 +32,9 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
    
-   output$desc2 = paste0("The chosen limit of X axis is ", input$xlim,"!")
+   output$desc2 = reactive({
+       paste0("The chosen limit of X axis is ", input$xlim,"!")
+   })
    # react
    
    output$desc = reactive({
@@ -47,7 +49,7 @@ server <- function(input, output) {
    
    output$time = reactive({
        paste0("Analysis of ", input$x, " and ", input$y, " started at ", Sys.time(),
-             ". Maximum value of variable ", input$x, " is ", max(mtcars[,input$x]), " initial limit was ", input$xlim, ".")
+             ". Maximum value of variable ", input$x, " is ", max(mtcars[,input$x]), " initial limit was ", isolate(input$xlim), ".")
        #iso
    })
    
