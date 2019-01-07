@@ -1,0 +1,11 @@
+accuracy metrics
+- confusion
+
+overfitting
+- variance, bias
+- complexity vs accuracy
+
+assumptions vs data
+- degrees of freedom
+
+measuring vs estimating error

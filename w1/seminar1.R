@@ -248,6 +248,7 @@ broadband$downAvg %>%
       stringr::str_replace("[0-9]*","") %>%
       stringr::str_replace(",[0-9]*","") %>% unique()
 
+# how to improve this?
 removeStuff <- function(x){
       x %>% stringr::str_replace("<4","2") %>%
             stringr::str_replace(",","\\.") %>%
@@ -286,11 +287,11 @@ broadband %>%
 data.table::as.data.table(broadband)[
       ,.(meanMax = mean(downMax),
          meanMin = mean(downMin)),
-      by = downAvg][
-            ,.(downAvg, meanMax, meanMin,
-               meanDif = meanMax - meanMin)][
-                     order(-meanDif)
-               ]
+      by = downAvg
+      ][,.(downAvg, meanMax, meanMin,
+           meanDif = meanMax - meanMin)
+        ][order(-meanDif)]
+
 #--- 2.3 LONG-WIDE -----------------------------------------------------------
 
 broadbandLong <- tidyr::gather(broadband[,1:5], key = "metric", value = "measure", downAvg:downMax)
