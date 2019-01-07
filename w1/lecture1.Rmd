@@ -11,12 +11,13 @@ output:
 knitr::opts_chunk$set(echo = FALSE, ffmpeg.format = "gif")
 library(animation)
 library(magrittr)
+library(ggplot2)
 ```
 ## Structure
 - Introduction & Course Overview
 - Project suggestions
+- ML intro
 - ETL process
-
 
 # Introduction & Course Overview
 
@@ -118,7 +119,7 @@ library(magrittr)
 
 
 ## Github
-- make an account
+- you should already have an account
 - [check the repo](https://github.com/MDA2018/lectures) (and watch it)
 
 - download the slides (sources)
@@ -158,6 +159,107 @@ library(magrittr)
     - (price and promotion) segmentation (w4)
         - shopping missions
     - churn analysis (w7)
+
+# ML intro
+
+## What do machines learn?
+supervised learning
+
+>- regression
+>- classification
+
+unsupervised
+
+>- clustering
+>- mapping
+
+## How do machines learn?
+- optimisation
+    - highest accuracy
+    - lowest variance
+
+RMSE = $\sqrt{\frac{\sum_{i=1}^{n}e_i^2}{n}}$  
+R^2 = $1 - \frac{SSR}{SST}$ </br> </br> </br>
+acc = $\frac{\sum_{i=1}^{n} 1 - |\hat y_i - y_i|}{n}$  
+entrophy = $\sum_{i=1}^{J}-p_i * log_2(p_i)$  
+gini = $1 - \sum_{i=1}^{J} p_i^2$  
+
+## Regression problems?
+
+```{r gloabl_local}
+x = -10:35
+inp = data.frame(beta = x, error = x^3 - 30*x^2 + 5000)
+
+ggplot(inp, aes(x = beta, y = error)) +
+    geom_line()
+
+```
+
+## Classification problems?
+Assume that 0.1 % of population has an illness.  
+We want to build a model that will predict (based on some symptoms),  
+whether the individual is healthy or not.  
+
+Our model is able to predict with 99.9 % accuracy.
+
+- What is the problem?
+
+>- It doesn't predict anything...
+
+## Classification problems?
+Assume that 0.1 % of population has an illness.  
+We want to build a model that will predict (based on some symptoms),  
+whether the individual is healthy or not.  
+
+- so called inbalanced classification
+    - the most accurate prediction is to say everyone is healthy
+    - not very helpful
+- how to spot?
+    - EDA
+    - confusion matrix
+```{r confusion}
+conf = matrix(c(1e6-1e3, 1e3, 0, 0), 2, 2)
+rownames(conf) = c("actual=1", "actual=0")
+colnames(conf) = c("pred=1", "pred=0")
+conf
+
+```
+
+## Classification problems?
+Assume that 0.1 % of population has an illness.  
+We want to build a model that will predict (based on some symptoms),  
+whether the individual is healthy or not.  
+
+- how to solve it?
+    - oversample?
+    - undersample?
+    - hybrid
+    - weighting
+
+## Statistics vs ML?
+<div style="float: left; width: 50%;">
+**stats**
+
+- based on mathematical methods
+- very strict framework
+- sometimes you best option
+</div>
+
+<div style="float: right; width: 50%;">
+**ML**
+
+- based on computer methods
+- loose framework
+- working in limit (assymptotic)
+</div>
+
+## Statistics vs ML?
+- estimation vs measuring the error
+    - efficiency
+- assumptions vs data
+    - degrees of freedom
+
+
 
 # ETL process
 
