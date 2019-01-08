@@ -253,13 +253,15 @@ whether the individual is healthy or not.
 - working in limit (assymptotic)
 </div>
 
-## Statistics vs ML?
+## Statistics vs ML? (ii)
 - estimation vs measuring the error
     - efficiency
 - assumptions vs data
-    - degrees of freedom
 
-
+## Overfitting
+- variance bias trade-off
+- complexity vs accuracy
+- concept similar to degrees of freedom
 
 # ETL process
 
@@ -306,9 +308,18 @@ read.table("data/lecture/load_error2.csv", fill = FALSE, skip = 1, nrows = 2)
 <img src="www/load_error3_2.png">  
 
 ## Encoding solution
-```{r, echo = TRUE}
-read.table("data/lecture/load_error3.csv", encoding = "UTF-8", stringsAsFactors = FALSE) %>% View()
+```{r, encoding, echo = TRUE}
+read.table("data/lecture/load_error3.csv",
+           encoding = "UTF-8",
+           stringsAsFactors = FALSE)
 ```
+
+```{r, encoding_true, include = FALSE}
+read.table("data/lecture/load_error3.csv",
+           encoding = "UTF-8",
+           stringsAsFactors = FALSE)$V1
+```
+
 
 > - more on encoding [here](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/) & [here](http://kunststube.net/encoding/)
 
@@ -321,7 +332,7 @@ test$V1
 <img src="www/load_error4.png">
 
 > - becomes problem with large files
-> - readLines again
+> - readLines
 
 ## Any other troubles?
 > - readLines

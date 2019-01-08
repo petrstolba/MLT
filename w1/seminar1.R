@@ -15,7 +15,7 @@ if (!dir.exists(path2data)) {
 
 #-- PART 1 - LOADING TIPS & TRICKS ############################################
 
-## download data @ https://drive.google.com/drive/folders/1RYDFVr3kZhss2HMaa4_87kKSQ2_TbJsU?usp=sharing
+## download data @ https://drive.google.com/drive/folders/1Dyyk2HCaoq4VLQJ3rRnYqmcjFABc_Ssk?usp=sharing
 
 #--- 1.1 SEVERAL SIMILAR FILES ------------------------------------------------
 

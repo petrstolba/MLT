@@ -3468,7 +3468,7 @@ if (document.readyState !== "loading" &&
 <li>working in limit (assymptotic)</li>
 </ul></div>
 
-</article></slide><slide class=""><hgroup><h2>Statistics vs ML?</h2></hgroup><article  id="statistics-vs-ml-1">
+</article></slide><slide class=""><hgroup><h2>Statistics vs ML? (ii)</h2></hgroup><article  id="statistics-vs-ml-ii">
 
 <ul>
 <li>estimation vs measuring the error
@@ -3476,11 +3476,15 @@ if (document.readyState !== "loading" &&
 <ul>
 <li>efficiency</li>
 </ul></li>
-<li>assumptions vs data
+<li>assumptions vs data</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Overfitting</h2></hgroup><article  id="overfitting">
 
 <ul>
-<li>degrees of freedom</li>
-</ul></li>
+<li>variance bias trade-off</li>
+<li>complexity vs accuracy</li>
+<li>concept similar to degrees of freedom</li>
 </ul>
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>ETL process</h2></hgroup><article  id="etl-process">
@@ -3534,7 +3538,16 @@ if (document.readyState !== "loading" &&
 
 </article></slide><slide class=""><hgroup><h2>Encoding solution</h2></hgroup><article  id="encoding-solution">
 
-<pre class = 'prettyprint lang-r'>read.table(&quot;data/lecture/load_error3.csv&quot;, encoding = &quot;UTF-8&quot;, stringsAsFactors = FALSE) %&gt;% View()</pre>
+<pre class = 'prettyprint lang-r'>read.table(&quot;data/lecture/load_error3.csv&quot;,
+           encoding = &quot;UTF-8&quot;,
+           stringsAsFactors = FALSE)</pre>
+
+<pre >##                                         V1
+## 1 &lt;U+FEFF&gt;&lt;U+0431&gt;&lt;U+043E&gt;&lt;U+0440&gt;&lt;U+0449&gt;
+## 2                         &lt;U+0419&gt;&lt;U+0439&gt;
+## 3                                       ôN
+## 4                         &lt;U+0436&gt;&lt;U+0416&gt;
+## 5                         &lt;U+0446&gt;&lt;U+0426&gt;</pre>
 
 <ul class = 'build'>
 <li>more on encoding <a href='https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/' title=''>here</a> &amp; <a href='http://kunststube.net/encoding/' title=''>here</a></li>
@@ -3548,7 +3561,7 @@ if (document.readyState !== "loading" &&
 
 <ul class = 'build'>
 <li>becomes problem with large files</li>
-<li>readLines again</li>
+<li>readLines</li>
 </ul>
 
 </article></slide><slide class=""><hgroup><h2>Any other troubles?</h2></hgroup><article  id="any-other-troubles">
