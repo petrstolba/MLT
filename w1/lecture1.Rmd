@@ -27,11 +27,11 @@ library(ggplot2)
 - Contact: michal.kubista@nielsen.com
 - Office hours: upon prior arrangment 
 - I'm bad with names ... *sorry*
-- <font color = "orange">**please include string "MDA2018" in your email subject** </font>
+- <font color = "orange">**please include string "MlT2019" in your email subject** </font>
 
 ## Organization
-- Monday: 16:15 - 19:30
-- Tuesday: 9:30 - 11:00
+- Tuesday: 16:15 - 19:30
+- Wednesday: 9:30 - 11:00
     - additional seminar used to wrap up more complex topics (like this week)
     - otherwise can be used for consultations (pre-agreed via email)
 
@@ -120,14 +120,12 @@ library(ggplot2)
 
 ## Github
 - you should already have an account
-- [check the repo](https://github.com/MDA2018/lectures) (and watch it)
+- [check the repo](https://github.com/CERGE-MAE/MlT) (and watch it)
 
 - download the slides (sources)
 - should you find any mistke in the materials
     + suggest edit via pull request
-- submit done via [Github classroom](https://classroom.github.com/a/KtcVpIMo)
-
-    + submitting sooner means more time to discuss before the deadline
+- submit done via [Github classroom](https://classroom.github.com/a/o1QP4jAf)
 
 ##  {.flexbox .vcenter}
 
@@ -186,7 +184,7 @@ gini = $1 - \sum_{i=1}^{J} p_i^2$
 
 ## Regression problems?
 
-```{r gloabl_local}
+```{r global_local}
 x = -10:35
 inp = data.frame(beta = x, error = x^3 - 30*x^2 + 5000)
 
@@ -218,7 +216,7 @@ whether the individual is healthy or not.
     - EDA
     - confusion matrix
 ```{r confusion}
-conf = matrix(c(1e6-1e3, 1e3, 0, 0), 2, 2)
+conf = matrix(c(1e6 - 1e3, 1e3, 0, 0), 2, 2)
 rownames(conf) = c("actual=1", "actual=0")
 colnames(conf) = c("pred=1", "pred=0")
 conf
