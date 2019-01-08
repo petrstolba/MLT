@@ -1,8 +1,8 @@
-# Marketing Data Analysis 2018
-This repository contains all lectures and seminars for Marketign Data Analysis course taught in 2018 by Michal Kubišta on CERGE-EI.
+# Machine Learning Techniques 2019
+This repository contains all lectures and seminars for Machine Learning Techniques course taught in 2019 by Michal Kubišta on CERGE-EI.
 
-Grades: https://tinyurl.com/y7fxf7nk  
-Q&A form: https://tinyurl.com/y7nqfm8z
+[Grades](https://tinyurl.com/y7fxf7nk) 
+[Q&A form](https://tinyurl.com/y7nqfm8z)
 
 Expected topics:
 
@@ -20,8 +20,6 @@ Expected topics:
 
 7.) Trees & Random Forests
 
-8.) Markov chains & Agent Based Modelling
+8.) Reporting methods
 
-9.) Reporting methods
-
-10.) Neural network techniques
+9.) Neural network techniques
