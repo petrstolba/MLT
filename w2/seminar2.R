@@ -52,6 +52,11 @@ map(prodTab, ~length(unique(.)))
     # we will not manage the duplicities to keep the the original
     # proportions
 
+prodTab[product_name %in% prodTab[duplicated(prodTab$product_name),
+                                  unique(product_name)]
+        ] %>% 
+        {unique(.)}
+
 # Define the injection function
     # to increase the number of variables to better feed our Bayes
     # classifier, we will split the product_names into three different
@@ -69,11 +74,12 @@ inject = function(x){
     # creating a new table and add the column names
 prodTab[, c("desc1", "desc2", "desc3") := inject(product_name),
         by = product_name]
+prodTab
 
 ## all factors!
     # change the column clases into factors
     # as Bayes is not able to work with text data
-prodTab = map_df(prodTab,as.factor)
+prodTab = map_df(prodTab, as.factor)
 
     # let's check the unique values in all columns
     # we have most of the unique descriptions in the second and third column
