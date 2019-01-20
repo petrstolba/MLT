@@ -145,7 +145,7 @@ ggplot(D, aes(x = a, y = b, color = as.factor(c))) +
 
 ## Distance weights
 
-$$support(class) = \sum_{i=1} \frac {1}{dist_{i}}$$
+$$support(class) = \sum_{i=1}^{k} \frac {1}{dist_{i}}$$
 
 ```{r knn_weight}
 a1 <- runif(10, 0, 3)
