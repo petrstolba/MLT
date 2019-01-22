@@ -1,7 +1,7 @@
 #####################
 ## Seminar 3       ##
 ## Michal Kubista  ##
-## 22 January 2018 ##
+## 22 January 2019 ##
 #####################
 
 setwd("w3/data")
