@@ -210,7 +210,7 @@ moviesTrain1 <- moviesTrain[indexTrain1,]
 moviesTrain2 <- moviesTrain[-indexTrain1,]
 
 result <- c()
-for (i in 1:160) {
+for (i in 1:60) {
     moviesTrain2$new <-
         knn(moviesTrain1[,4:22],
             moviesTrain2[,4:22],
@@ -279,9 +279,8 @@ user <- ratings[sample(1:100000,1), "userId"]
 ## user movies
 ratings %>% 
     filter(userId == user) %>% 
-    select(movieId) -> userMov
-
-userMov <- userMov$movieId
+    select(movieId) %>% 
+    pull(movieId) -> userMov
 
 ## find movies in matrix and filter
 rownames(item) %in% userMov %>% which() -> indexCR
@@ -296,11 +295,18 @@ bestPicks %>% which.max() %>% rownames(bestPicks)[.] -> no1
 movies %>% 
     filter(movieId == no1)
 
+movies %>%
+    filter(movieId %in% userMov) %>% 
+    .[,4:22] %>% 
+    map_dbl(mean) %>% 
+    {.[order(., decreasing = T)]}
+
 ## what has the user already seen?
 movies %>%
     filter(movieId %in% userMov) %>% View()
 
 ratings[ratings$userId == user & ratings$movieId == no1,]
+
 
 rm(ratMR, item, userMov, indexCR, itemChoice, bestPicks, no1, user)
 
