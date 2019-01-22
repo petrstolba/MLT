@@ -14,29 +14,34 @@ sapply(
 #-- PART 1 - ETL ##############################################################
 
 #--- 1.1 DATA DOWNLOAD --------------------------------------------------------
-url <- "http://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
-download.file(url, "data.zip")
-unzip("data.zip")
-rm(url)
+# url <- "http://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
+# download.file(url, "data.zip")
+# unzip("data.zip")
+# rm(url)
+# 
+# list.files()
+# newFiles <- list.files("ml-latest-small", full.names = TRUE)
+# 
+# ## move the files
+# for (i in newFiles) {
+#     new <- gsub("ml-latest-small/","",i)
+#     file.rename(i, new)
+# }
+# 
+# readLines("README.txt") %>% 
+#     gsub("-*","",.) %>% 
+#     gsub("=*","",.) %>% 
+#     .[!. == ""] 
+# 
+# ## clean the directory
+# rm(i, newFiles, new)
+# file.remove(c("data.zip","links.csv", "README.txt"))
+# unlink("ml-latest-small", recursive = TRUE)
 
-list.files()
-newFiles <- list.files("ml-latest-small", full.names = TRUE)
-
-## move the files
-for (i in newFiles) {
-    new <- gsub("ml-latest-small/","",i)
-    file.rename(i, new)
-}
-
-readLines("README.txt") %>% 
-    gsub("-*","",.) %>% 
-    gsub("=*","",.) %>% 
-    .[!. == ""] 
-
-## clean the directory
-rm(i, newFiles, new)
-file.remove(c("data.zip","links.csv", "README.txt"))
-unlink("ml-latest-small", recursive = TRUE)
+#########################################################################
+# DOWNLOAD DATA AT
+# https://drive.google.com/open?id=1t4OJgz9c2d_ki0YS0owBC8Ic_kCHCR6v
+#########################################################################
 
 ## read input
 input <- map(list.files(), fread, data.table = F)
