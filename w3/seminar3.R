@@ -7,6 +7,12 @@
 setwd("w3/data")
 ## very, very bad practise!
 
+path2data = "w3/data"
+
+if (!dir.exists(path2data)) {
+    dir.create(path2data, recursive = T)
+}
+
 sapply(
     c("data.table","dplyr","magrittr","ggplot2", "purrr"),
     require, character.only = T)
@@ -14,17 +20,17 @@ sapply(
 #-- PART 1 - ETL ##############################################################
 
 #--- 1.1 DATA DOWNLOAD --------------------------------------------------------
-# url <- "http://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
+# url = "http://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
 # download.file(url, "data.zip")
 # unzip("data.zip")
 # rm(url)
 # 
 # list.files()
-# newFiles <- list.files("ml-latest-small", full.names = TRUE)
+# newFiles = list.files("ml-latest-small", full.names = TRUE)
 # 
 # ## move the files
 # for (i in newFiles) {
-#     new <- gsub("ml-latest-small/","",i)
+#     new = gsub("ml-latest-small/","",i)
 #     file.rename(i, new)
 # }
 # 
@@ -44,11 +50,11 @@ sapply(
 #########################################################################
 
 ## read input
-input <- map(list.files(), fread, data.table = F)
-names(input) <- list.files() %>% gsub(".csv","",.) 
+input = map(list.files(), fread, data.table = F)
+names(input) = list.files() %>% gsub(".csv","",.)
 
 #--- 1.2 TAGS EXPLORATION -----------------------------------------------------
-tags <- input$tags
+tags = input$tags
 
 ## basic overview
 dim(tags)
@@ -73,11 +79,11 @@ tags$tag %>%
     table() %>% 
     as.data.frame() %>% View()
 
-input$tags <- NULL
+input$tags = NULL
 rm(tags)
 
 #--- 1.3 MOVIES EXPLORATION ---------------------------------------------------
-movies <- input$movies
+movies = input$movies
 
 ## basic overview
 dim(movies)
@@ -102,9 +108,9 @@ movies %>%
     filter(title == "War of the Worlds (2005)")
 
 ## set for later
-reset_ID <- function(ids){
-    ids[ids == "65665"] <- "3598"
-    ids[ids == "64997"] <- "34048"
+reset_ID = function(ids){
+    ids[ids == "65665"] = "3598"
+    ids[ids == "64997"] = "34048"
     return(ids)
 }
 
@@ -118,7 +124,7 @@ movies$genres %>%
     unique() -> genres
 
 ## helper function 
-set_genre <- function(x){
+set_genre = function(x){
     x %>% 
         strsplit("\\|") %>% 
         unlist -> 
@@ -133,15 +139,15 @@ map(movies$genres, set_genre) %>%
     unlist() %>% 
     matrix(nrow(movies),length(genres), byrow = T) -> genreTable
 
-colnames(genreTable) <- genres
+colnames(genreTable) = genres
 
 ## add genres to movies
-movies <- cbind(movies, genreTable)
+movies = cbind(movies, genreTable)
 
 rm(genres, genreTable, set_genre)
 
 #--- 1.4 RATING EXPLORATION ---------------------------------------------------
-ratings <- input$ratings
+ratings = input$ratings
 
 ## basic overview
 dim(ratings)
@@ -149,7 +155,7 @@ ratings %>% str
 ratings %>% summary
 
 ## column format
-ratings[,1:2] <-  apply(ratings[,1:2],2, as.character)
+ratings[,1:2] =  apply(ratings[,1:2],2, as.character)
 
 ratings$timestamp %<>% as.POSIXct(origin = "1970-01-01")
 summary(ratings$timestamp)
@@ -193,7 +199,7 @@ ggplot(rat547, aes(x = timestamp, y = rating)) +
 ## choose threshold
 ## this is a parametr!!!
     ## it's choice needs discussion
-rat547$class <- ifelse(rat547$rating > 4, 1, 0)
+rat547$class = ifelse(rat547$rating > 4, 1, 0)
 mean(rat547$class)
 
 if (!require(class)) {
@@ -201,40 +207,40 @@ if (!require(class)) {
     library(class)
 }
 
-movies547 <- left_join(movies,rat547[,c("movieId","class")])
+movies547 = left_join(movies,rat547[,c("movieId","class")])
 colnames(movies547)
 
-moviesTrain <- movies547 %>% filter(!is.na(class))
-moviesTest <- movies547 %>% filter(is.na(class))
+moviesTrain = movies547 %>% filter(!is.na(class))
+moviesTest = movies547 %>% filter(is.na(class))
 
 #--- 2.2 CROSS-VALIDATION: FIND THE RIGHT "k" ---------------------------------
 set.seed(1234)
-indexTrain1 <- sample(1:nrow(moviesTrain),1500)
+indexTrain1 = sample(1:nrow(moviesTrain),1500)
 
-moviesTrain1 <- moviesTrain[indexTrain1,]
-moviesTrain2 <- moviesTrain[-indexTrain1,]
+moviesTrain1 = moviesTrain[indexTrain1,]
+moviesTrain2 = moviesTrain[-indexTrain1,]
 
-result <- c()
-for (i in 1:60) {
-    moviesTrain2$new <-
+result = c()
+for (i in 1:100) {
+    moviesTrain2$new =
         knn(moviesTrain1[,4:22],
             moviesTrain2[,4:22],
             moviesTrain1[,"class"],
             i)
     
-    result[i] <- mean(moviesTrain2$new == moviesTrain2$class)
+    result[i] = mean(moviesTrain2$new == moviesTrain2$class)
     print(result[i])
 }
 
 plot(1:i, result, type = "l")
-k <- which.max(result)
-k
+k = which.max(result)
+k = 2
 
 rm(result, moviesTrain1, moviesTrain2, indexTrain1, i)
 
 ##--- 2.3 RECOMMEND -----------------------------------------------------------
 
-moviesTest$new <-
+moviesTest$new =
     knn(moviesTrain[,4:22], moviesTest[,4:22], moviesTrain[,"class"], k)
 
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
@@ -252,34 +258,34 @@ rm(moviesTest, moviesTrain, movies547, rat547, k)
 ##--- 3.1 - PREPARATIONS ------------------------------------------------------
 if (!require(tidyr)) {
     install.packages("tidyr")
-    require(tidyr)
+    library(tidyr)
 }
 
 ratings[c(99041,99132),]
-ratings <- ratings[-99132,]
+ratings = ratings[-99132,]
 
 ratings %>% 
     mutate(class = ifelse(rating > 4, 1, 0)) %>% 
     select(userId, movieId, class) %>%  
     spread(key = userId, value = class, fill = 0) -> ratM 
 
-rownames(ratM) <- ratM$movieId
-ratM$movieId <- NULL
+rownames(ratM) = ratM$movieId
+ratM$movieId = NULL
 
 ratM %<>% as.matrix()
 
 ##--- 3.2 - ITEM-ITEM ---------------------------------------------------------
 ## way too much for my PC, need to filter
-ratMR <- ratM[1:1000,]
+ratMR = ratM[1:1000,]
 
 ## factorisation
-item <- ratMR %*% t(ratMR) 
+item = ratMR %*% t(ratMR) 
 
 ## erase self-incidence
-diag(item) <- 0
+diag(item) = 0
 
 ## choose an user (287 works well)
-user <- ratings[sample(1:100000,1), "userId"]
+user = ratings[sample(1:100000,1), "userId"]
 
 ## user movies
 ratings %>% 
@@ -289,7 +295,7 @@ ratings %>%
 
 ## find movies in matrix and filter
 rownames(item) %in% userMov %>% which() -> indexCR
-itemChoice <- item[indexCR,]
+itemChoice = item[indexCR,]
 
 ## for each movie, find the most similar one
 apply(itemChoice, 1, which.max) %>% table -> bestPicks
@@ -316,11 +322,11 @@ ratings[ratings$userId == user & ratings$movieId == no1,]
 rm(ratMR, item, userMov, indexCR, itemChoice, bestPicks, no1, user)
 
 ##--- 3.3 - USER - USER -------------------------------------------------------
-user <- t(ratM) %*% ratM
-diag(user) <- 0
+user = t(ratM) %*% ratM
+diag(user) = 0
 
 ## choose one user (323)
-userID <- rownames(user)[sample(1:600,1)]
+userID = rownames(user)[sample(1:600,1)]
 
 ## most similar users
 user[userID,] %>% table() %>% rev() -> bestPicks
@@ -328,7 +334,7 @@ bestPicks
 
 ## at least 10 users
     ## parameter again!
-index <- which.max(cumsum(bestPicks) >= 10)
+index = which.max(cumsum(bestPicks) >= 10)
 names(bestPicks) %>% as.numeric() %>% .[seq_len(index)] -> index
 
 user[userID,] %in% index %>% which() %>% rownames(user)[.] -> userSim
@@ -346,4 +352,5 @@ View(movies %>%
          filter(movieId %in% recom[1:10,1]))
 
 ## what has the user watched
-movies[movies$movieId %in% ratings[ratings$userId == userID,"movieId"],] %>% View()
+movies[movies$movieId %in% ratings[ratings$userId == userID,"movieId"],] %>%
+    View()
