@@ -1,7 +1,7 @@
 ---
 title: "Lecture 4"
 author: "Michal Kubi&#353;ta"
-date: "29 January 2018"
+date: "23 January 2019"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -42,7 +42,7 @@ set.seed(123)
 # Clustering introduction
 
 ## About clustering
-- the main topic in marketing
+- a very frequent step in analyses
     - cluster your customers
     - cluster your products
 - unsupervised learning
@@ -226,7 +226,8 @@ ggplot(clustList[[length(clustList)]], aes(x = a, y = b, color = as.factor(lab))
     - link to the picture on the next slide
 
 ## Linkage graphically
-<img src="www/linkage.png", height = "500", align = "center">
+
+<img src="www/linkage.png" height = "500" align = "center">
 
 ## Overview
 - segment data into a hierarchy
@@ -351,7 +352,7 @@ mat[,1:2] %>%
     - density based on parameters
         - **eps** = distance
         - **minPoints** = number of points
-    - check if there is at least minPoints in **eps** around chosen point
+    - check if there is at least **minPoints** in **eps** around chosen point
 - core, border, outlier points
     - core = point with at least **minPoints** around
     - border = point at least **eps** far from core point
