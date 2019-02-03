@@ -36,17 +36,15 @@ OLS
     1. linear relationship
         - transformations
     2. zero expected error ($E(\epsilon_{i}) = 0$)
-        - intercept
     3. no perfect multicollinearity (full X matrix rank)
     4. <font color="orange">**homoskedasticity**</font> ($E(\epsilon_{i}^{2}) = const$)
-        - slope
         
 ## OLS estimation
 $$\hat\beta = (X^{T}X)^{-1}X^{T}y$$
 **n** observations, **k** variables (\* = OK for small **k**)
 
 - $X^T \; complextity \; O(nk)$ *
-- $X^{T}X = T_{k*k} \; complexity \; O(n^{2}k)$ <font color="red">**!**</font>
+- $X^{T}X = T_{k*k} \; complexity \; O(nk^{2})$ *
 - $T^{-1} = U_{k*k} \; complexity \; O(k^{3})$ *
 - $UX^{T} = V_{k*n} \; complexity \; O(nk^{2})$ *
 - $Vy = W_{k*1} \; complexity \; O(nk)$ *
@@ -96,7 +94,7 @@ gganimate(rndPlot)
 - if other parameters lead to lower SSR
     - rewrite the best estimation
 - new estimation close to the parameters of the best estimation 
-- <font color="orange">**very simple**</font> MCMC process
+- <font color="orange">**simplified**</font> MCMC process
   
 ## (iii) random guess + evolution + reproduction
 
@@ -260,8 +258,8 @@ biplot(pca, cex = 0.5)
 ```
 
 ## Math behind - eigenvalue ~ explained variance
-$C = covariance \; matrix, n*m$  
-$w = vector, n*1, ||w|| = 1$ 
+$C = covariance \; matrix \; k \times k$  
+$w = vector, k \times 1, ||w|| = 1$  
 $\lambda \in R$  
 
 Lagrange, maximise  

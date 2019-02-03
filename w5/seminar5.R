@@ -1,7 +1,7 @@
 #####################
 ## Seminar 5       ##
 ## Michal Kubista  ##
-## 5 February 2018 ##
+## 5 February 2019 ##
 #####################
 
 # install.packages("rpart")
@@ -17,12 +17,12 @@ sapply(
 
 #--- 1.1 ETL -------------------------------------------------------------------
 # data from https://community.tableau.com/docs/DOC-1236
-url <- "https://community.tableau.com/servlet/JiveServlet/downloadBody/1236-102-2-15278/Sample%20-%20Superstore.xls"
+url = "https://community.tableau.com/servlet/JiveServlet/downloadBody/1236-102-2-15278/Sample%20-%20Superstore.xls"
 dir.create("w5/data")
 download.file(url, "w5/data/transac.xls", mode = "wb")
 rm(url)
 
-raw <- read_excel("w5/data/transac.xls") %>% as.data.table()
+raw = read_excel("w5/data/transac.xls") %>% as.data.table()
 ## ID coercing
 
 str(raw)
@@ -30,25 +30,23 @@ summary(raw)
 
 map_dbl(raw, ~length(unique(.)))
 
-colnames(raw)
-
 #---- 1.1.1 TABLES SPLITTING ---------------------------------------------------
 ## customer table
-cust <- raw[,.(cust_name = unique(`Customer Name`),
+cust = raw[,.(cust_name = unique(`Customer Name`),
                segment = unique(Segment)
                ),
             by = "Customer ID"]
 setnames(cust, "Customer ID", "cust_ID")
 
 ## products table
-prod <- raw[,.(cat = unique(Category),
+prod = raw[,.(cat = unique(Category),
                subcat = unique(`Sub-Category`),
                desc = unique(`Product Name`)),
             by = "Product ID"]
 setnames(prod, "Product ID", "prod_ID")
 
 ## locations table
-loc <- raw[,.(city = unique(City),
+loc = raw[,.(city = unique(City),
               state = unique(State),
               region = unique(Region)),
            by = "Postal Code"]
@@ -65,7 +63,7 @@ loc[duplicated(loc$zip),zip] %>%
 loc[zip == "92024" & city == "Encinitas", zip := 92028]
 
 ## transactions table
-pur <- raw[,.(pur_ID = unique(`Order ID`),
+pur = raw[,.(pur_ID = unique(`Order ID`),
               date = unique(`Order Date`),
               trans_mode = unique(`Ship Mode`),
               cust_ID = unique(`Customer ID`),
@@ -111,8 +109,11 @@ pur[,
 ggplot(bas, aes(x = sales)) +
     geom_histogram(binwidth = 1000)
 
-ggplot(bas[sales < 1000,], aes(x = sales)) +
+ggplot(bas[sales < 1000], aes(x = sales)) +
     geom_histogram(binwidth = 100)
+
+ggplot(bas[sales < 1000], aes(x = 1, y = sales)) +
+    geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))
 
 ## the lower the prices, the more the items?
 ggplot(bas, aes(x = items, y = price)) +
@@ -124,7 +125,7 @@ ggplot(bas[order(bas$promoC),], aes(x = 1:nrow(bas), y = promoC)) +
     geom_line()
 
 ### analyse the periodicity on nopromo baskets ####
-np_bas <-  bas[promoC == 0]                       #
+np_bas =  bas[promoC == 0]                       #
 np_bas$cust_ID %>% unique %>% length              #
                                                   #
 np_bas$cust_ID %>%                                #
@@ -199,25 +200,25 @@ custStats %<>%
 ## into matrix and scale
 custStats %>% summary()
     
-custStatsS <- custStats[,-1]
-custStatsS <- apply(custStatsS, 2, scale)
-rownames(custStatsS) <- custStats[,1]
+custStatsS = custStats[,-1]
+custStatsS = apply(custStatsS, 2, scale)
+rownames(custStatsS) = custStats[,1]
 
 ## kmeans
 set.seed(123)
 
-ss <- rep(NA, 20)
+ss = rep(NA, 20)
 for (i in 1:20) {
-    ss[i] <- kmeans(custStatsS, i)$tot.withinss
+    ss[i] = kmeans(custStatsS, i)$tot.withinss
 }
 plot(1:20, ss, type = "b")
 k = 3
 
-custStats$group <- kmeans(custStatsS, k)$cluster
+custStats$group = kmeans(custStatsS, k)$cluster
 cluster::clusplot(custStatsS, custStats$group, color = TRUE, shade = T, labels = 1)
 table(custStats$group)
 
-tree <- rpart(as.factor(group)~., custStats[,-1])
+tree = rpart(as.factor(group)~., custStats[,-1])
 fancyRpartPlot(tree)
 
 #--- 2.1 PRODUCTS --------------------------------------------------------------
@@ -238,64 +239,57 @@ prodStats[prod[,.(prod_ID, cat)], on = "prod_ID"
               ][!duplicated(prod_ID), !"cat"] -> prodStats
 
 ## matrix and scale
-rownames(prodStats) <- prodStats$prod_ID
-prodStatsS <- apply(prodStats[,-1], 2, scale)
-rownames(prodStatsS) <- prodStats$prod_ID
+rownames(prodStats) = prodStats$prod_ID
+prodStatsS = apply(prodStats[,-1], 2, scale)
+rownames(prodStatsS) = prodStats$prod_ID
 
-cluster <- hclust(dist(prodStatsS), method = "average")
+cluster = hclust(dist(prodStatsS), method = "average")
 # plot(cluster)
 
 set.seed(123)
-res <- rep(NA, 20)
+res = rep(NA, 20)
 for (i in 1:20) {
-    res[i] <- kmeans(prodStatsS, i)$tot.withinss
+    res[i] = kmeans(prodStatsS, i)$tot.withinss
 }
 plot(1:20, res, type = "b")
 k = 4
 
-prodStats$group <- kmeans(prodStatsS, k)$cluster
+prodStats$group = kmeans(prodStatsS, k)$cluster
 
-tree <- rpart(as.factor(group) ~ ., prodStats[,-1])
+tree = rpart(as.factor(group) ~ ., prodStats[,-1])
 fancyRpartPlot(tree)
 
 ## pca
-pca <- prcomp(prodStatsS)
+pca = prcomp(prodStatsS)
 biplot(pca)
 
 summary(pca)
 
-plot(1/summary(pca)$importance[3,], type = "b")
-
-ss <- rep(NA, 20)
+ss = rep(NA, 20)
 for (i in 1:20) {
-    ss[i] <- kmeans(pca$x[,1:2], i)$tot.withinss
+    ss[i] = kmeans(pca$x[,1:3], i)$tot.withinss
 }
 plot(1:20, ss, type = "b")
 k = 3
 
-prodStats$group <- kmeans(pca$x[,1:2], k)$cluster
+prodStats$group = kmeans(pca$x[,1:3], k)$cluster
 cluster::clusplot(prodStatsS, prodStats$group, color = TRUE, shade = T, labels = 1)
 
 table(prodStats$group)
 
-tree <- rpart(as.factor(group)~., prodStats[,-1])
+tree = rpart(as.factor(group)~., prodStats[,-1])
 fancyRpartPlot(tree)
 tree$variable.importance / sum(tree$variable.importance)
 
 ## which customers which items?
 custStats %<>% as.data.table() 
-pur[custStats[,.(cust_ID, group)], on = "cust_ID"
-    ][prodStats[,.(prod_ID, group)], on = "prod_ID"] -> purGrp
-
-setnames(purGrp, c("group", "i.group"), c("custG", "prodG"))
+pur[custStats[,.(cust_ID, custG = group)], on = "cust_ID"
+    ][prodStats[,.(prod_ID, prodG = group)], on = "prod_ID"] -> purGrp
 
 purGrp[,.(custG, prodG)
        ][,.(freq = .N),
          by = .(custG, prodG)] -> purGrp
-
-custSum <- purGrp[,.(sum = sum(freq)), by = "custG"]
-
-purGrp[custSum, on = "custG"
+purGrp[, sum := sum(freq), by = "custG"
        ][,share := freq/sum
          ][,.(custG, prodG, share)] -> purGrp
 
