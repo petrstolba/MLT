@@ -1,7 +1,7 @@
 ---
 title: "Lecture 6"
 author: "Michal Kubi&#353;ta"
-date: "12 February 2018"
+date: "12 February 2019"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -35,7 +35,7 @@ library(gganimate)
         - benchmarking against similar products
     - same products (retailers, wholesalers)
         - main focus today
-            - enough data properly analyse
+            - enough data to properly analyse
 
 ## Important concepts
 - elasticity
@@ -252,9 +252,9 @@ ggplot(mixed, aes(x = x, y = y, col = as.factor(z)))+
     - very computionally intensive
     - harder to interpret
     - solving averaging problem
-- fixed effect
+- linear regression
     - simpler
         - computation and interpretation
-    - enough for marginal effects
+    - potentionally misleading
     
 
