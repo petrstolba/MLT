@@ -1,7 +1,7 @@
 #####################
 ## Seminar 7       ##
 ## Michal Kubista  ##
-## 26 February 2018##
+## 5 March 2018    ##
 #####################
 
 sapply(
