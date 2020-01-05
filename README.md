@@ -1,8 +1,9 @@
-# Machine Learning Techniques 2019
-This repository contains all lectures and seminars for Machine Learning Techniques course taught in 2019 by Michal Kubišta on CERGE-EI.
+# Machine Learning Techniques 2020
+This repository contains all lectures and seminars for Machine Learning Techniques course taught in 2020 by Michal Kubišta on CERGE-EI.
 
-[Grades](https://tinyurl.com/y7fxf7nk) 
-[Q&A form](https://tinyurl.com/y7nqfm8z)
+[Grades](https://tinyurl.com/y7fxf7nk)  
+[Questions form](https://forms.gle/j51sFJcKfJAxd1gU8)  
+[Answers](https://tinyurl.com/ulrvm29)  
 
 Expected topics:
 
