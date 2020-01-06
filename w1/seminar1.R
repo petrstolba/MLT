@@ -1,7 +1,7 @@
 ####################
 ## Seminar 1      ##
 ## Michal Kubista ##
-## 8 January 2018 ##
+## 6 January 2020 ##
 ####################
 
 sapply(c("data.table","dplyr","magrittr","ggplot2"),
@@ -52,7 +52,7 @@ auction_Names = function(){
       files = files[grep("auction_day",files)]
       return(files)
 
-}
+}()
 
 #---- 1.1.1 FOR LOOP ----------------------------------------------------------
 auction_Names()
@@ -191,17 +191,17 @@ rm(upc)
 
 #--- 2.1 REGEX ----------------------------------------------------------------
 #---- 2.1.1 TO BE, OR NOT TO BE
-hamlet = readLines("http://www.gutenberg.org/files/1524/1524-0.txt")
+hamlet = readLines("http://www.gutenberg.org/files/1524/1524-0.txt")#, encoding = "UTF-8")
 hamlet[1:50]
 
 grep("hamlet.*prince.*denmark", hamlet[1:500], ignore.case = TRUE)
 
-hamlet = hamlet[-1:-286]
+hamlet = hamlet[-1:-78]
 
 hamlet = hamlet[-which(hamlet == "")]
 
-hamText = hamlet[31:length(hamlet)]
-hamHead = hamlet[1:30]
+hamHead = hamlet[1:25]
+hamText = hamlet[26:length(hamlet)]
 rm(hamlet)
 
 sum(grepl("rosencrantz", hamText, ignore.case = TRUE))
@@ -330,4 +330,4 @@ summary(fit)
 orlyRes = data.frame(fitted = fit$fitted.values, resid = fit$residuals)
 
 ggplot(orlyRes, aes(x = fitted, y = resid)) + 
-      geom_point(size = 1)
+      geom_point(size = 2)
