@@ -51,8 +51,7 @@ auction_Names = function(){
       files = list.files(path2data, full.names =  T)
       files = files[grep("auction_day",files)]
       return(files)
-
-}()
+}
 
 #---- 1.1.1 FOR LOOP ----------------------------------------------------------
 auction_Names()
@@ -191,7 +190,7 @@ rm(upc)
 
 #--- 2.1 REGEX ----------------------------------------------------------------
 #---- 2.1.1 TO BE, OR NOT TO BE
-hamlet = readLines("http://www.gutenberg.org/files/1524/1524-0.txt")#, encoding = "UTF-8")
+hamlet = readLines("http://www.gutenberg.org/files/1524/1524-0.txt", encoding = "UTF-8")
 hamlet[1:50]
 
 grep("hamlet.*prince.*denmark", hamlet[1:500], ignore.case = TRUE)
@@ -206,7 +205,6 @@ rm(hamlet)
 
 sum(grepl("rosencrantz", hamText, ignore.case = TRUE))
 length(grep("rosencrantz", hamText, ignore.case = TRUE))
-
 
 finder = function(name){
     a = length(grep(name, hamText, ignore.case = TRUE))
@@ -310,7 +308,7 @@ auction = data.table::fread(file.path(path2data,"auction.csv"),
 #--- 3.1 BASE R
 
 colSelect =
-    !colnames(auction) %in% c("auctionid","bidder","item","auction_type")
+    !colnames(auction) %in% c("auctionid","bidder","item")
 plot(auction[,colSelect])
 
 #--- 3.2 GGally
