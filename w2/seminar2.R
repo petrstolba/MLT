@@ -1,7 +1,7 @@
 #####################
 ## Seminar 2       ##
 ## Michal Kubista  ##
-## 15 January 2019 ##
+## 13 January 2020 ##
 #####################
 
 install_and_load = function(name, char = T){
@@ -52,8 +52,7 @@ map(prodTab, ~length(unique(.)))
     # we will not manage the duplicities to keep the the original
     # proportions
 
-prodTab[product_name %in% prodTab[duplicated(prodTab$product_name),
-                                  unique(product_name)]
+prodTab[product_name %in% prodTab[duplicated(prodTab$product_name), unique(product_name)]
         ] %>% 
         {unique(.)}
 
@@ -113,7 +112,7 @@ train %>%
 test$lab = predict(bayes, test)
 
 ## changin the columns
-    # changing the column order for the purpose ofo interpratation and
+    # changing the column order for the purpose of interpretation and
     # model performance assessment, putting the original and predicted
     # labels next to each other
     # the accuracy looks very well on the first peak
@@ -125,9 +124,9 @@ test$ok = test$category_name == test$lab
     # defining the accuracy statistics:
     # overall accuracy = the overall accuracy is very good, 93,1 %
     # confusion table = we see no large problems in the model
-    #                   there is no label that would be systematically
-    #                   mispredicted; the categories with higher amount of
-    #                   observations have higher number of bad predictions,
+    #                   there are just two labels that are systematically
+    #                   mispredicted (a very small ones); the categories with
+    #                   higher amount of observations have higher number of bad predictions,
     #                   but there is no surprise in that either 
 sum(test$ok)/nrow(test) * 100
 
@@ -241,7 +240,7 @@ download.file(url, "w2/data/online_retail.xlsx", mode = 'wb' )
 # because of the problems with excel reading, after downloading the file
 # from Gdrive, run following
 # !!!!! if you read the csv start from line 262  !!!!
-transRaw = fread("w2/data/online.csv")
+# transRaw = fread("w2/data/online.csv")
 
 transRaw = read_xlsx("w2/data/online_retail.xlsx")
 str(transRaw)
