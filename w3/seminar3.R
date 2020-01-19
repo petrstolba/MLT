@@ -1,17 +1,17 @@
 #####################
 ## Seminar 3       ##
 ## Michal Kubista  ##
-## 22 January 2019 ##
+## 20 January 2020 ##
 #####################
-
-setwd("w3/data")
-## very, very bad practise!
 
 path2data = "w3/data"
 
 if (!dir.exists(path2data)) {
     dir.create(path2data, recursive = T)
 }
+
+setwd("w3/data")
+## very, very bad practise!
 
 sapply(
     c("data.table","dplyr","magrittr","ggplot2", "purrr"),

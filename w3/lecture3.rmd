@@ -1,7 +1,7 @@
 ---
 title: "Lecture 3"
 author: "Michal Kubi&#353;ta"
-date: "22 January 2019"
+date: "20 January 2020"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -206,7 +206,7 @@ ggplot(D2, aes(x = a, y = b, color = as.factor(c))) +
 
 ## Popularity
 
-- reccomend the most popular products
+- recommend the most popular products
 - good start, insufficient on it's own
 
 ## Content
