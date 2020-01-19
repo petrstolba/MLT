@@ -119,7 +119,7 @@ names(input) = inFileNames %>% gsub(".*/","",.) %>% gsub(".csv","",.)
 dtTable = input$auctionTable[input$itemTable, on = "ID"
                             ][input$priceTable, on = "ID"]
 
-rm(dtTable, input)
+rm(dtTable)
 
 #---- 1.2.2 (D)PLYR JOIN ----------------------------------------------------
 

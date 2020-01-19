@@ -5,7 +5,7 @@
 #####################
 
 sapply(
-    c("data.table","tidyverse","magrittr","readxl", "GGally",
+    c("data.table","tidyverse","magrittr", "GGally",
       "rpart", "rattle", "randomForest", "forestFloor", "caret"),
     require,
     character.only = T
