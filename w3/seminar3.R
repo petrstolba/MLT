@@ -61,11 +61,26 @@ dim(tags)
 tags %>% str
 tags %>% summary
 
+# Convert time-date to useful format
+#
+# Reminder: Using notation %<>% we UPDATE LHS using a function on RHS
+#
 tags$timestamp %<>% as.POSIXct(origin = "1970-01-01")
 
+# Next line does the same withou pipes
+# tags$timestamp <- as.POSIXct(tags$timestamp,origin = "1970-01-01")
+
+
+# Count unique elements in the data
 map(tags, ~length(unique(.)))
 
 ## table & frequency
+# Functions in the following pipe:
+# - "table" counts frequencies
+# - Operator %T>% calls subsequent command and returns the original data on LHS
+# - "hist()" makes histogram
+# - "select()" chooses only variables which are mentioned (Freq)
+
 tags$userId %>% 
     table %T>%
     hist() %>%
@@ -73,34 +88,47 @@ tags$userId %>%
     select(Freq) %>% 
     summary()
 
+# Next line does the same:
+# summary(select(as.data.frame(table(tags$userId)),Freq))
+
+# Show first element
 tags$tag %>% head()
 
+# View frequencies of tags
 tags$tag %>% 
     table() %>% 
     as.data.frame() %>% View()
 
+# Remove movie tags and switch to data on movies.
 input$tags = NULL
 rm(tags)
 
 #--- 1.3 MOVIES EXPLORATION ---------------------------------------------------
+
 movies = input$movies
 
-## basic overview
+## basic overview: data size, description and summary
 dim(movies)
 movies %>% str
 movies %>% summary
 
+# convert movieId to strings
 movies$movieId %<>% as.character()
 
+# count unique elements in each column: more Ids than movies: some (two!!!) titles are duplicated
 map(movies, ~length(unique(.)))
 
-## find non-unique titles
+## find non-unique titles (using pipes):
+#  count frequencies for each title -> sort in descending order -> slice first two elements
+
 movies$title %>% 
     table %>% 
     as.data.frame() %>%
     arrange(desc(Freq)) %>% 
     head(2)
 
+# Repeated movies are Hamlet (2000) and War of the Worlds (2005)
+# Now, we want to exclude them from the data. For that reason, we look for Ids of these movies and reassign
 movies %>% 
     filter(title == "Hamlet (2000)")
 
@@ -114,16 +142,21 @@ reset_ID = function(ids){
     return(ids)
 }
 
+# We can remove these repeated records just in one line
 movies %<>%
     filter(movieId != "65665" & movieId != "64997")
 
-## list of genres
+## We're going to look for k-nearest movie using gendres.
+## Now, we make a list of genres by splitting the column "genres"
 movies$genres %>% 
     strsplit("\\|") %>%
     unlist() %>% 
     unique() -> genres
 
-## helper function 
+# Overall, 20 different genres
+
+## helper function :
+#  take the string with genres -> split genres by symbol "|" -> indicate genres
 set_genre = function(x){
     x %>% 
         strsplit("\\|") %>% 
@@ -141,7 +174,7 @@ map(movies$genres, set_genre) %>%
 
 colnames(genreTable) = genres
 
-## add genres to movies
+## add genres to movies data
 movies = cbind(movies, genreTable)
 
 rm(genres, genreTable, set_genre)
@@ -157,37 +190,45 @@ ratings %>% summary
 ## column format
 ratings[,1:2] =  apply(ratings[,1:2],2, as.character)
 
+# again, convert time-date to useful format
 ratings$timestamp %<>% as.POSIXct(origin = "1970-01-01")
-summary(ratings$timestamp)
+#summary(ratings$timestamp)
 
-## unique per column
+## count unique elements per column
 map(ratings, ~length(unique(.)))
 
-## reset ID of duplicated movies
+## reset ID of duplicated movies. Here, we're using the function that we have defined before
 ratings$movieId %<>% 
     reset_ID
 
-## check integrity
+## check integrity: 
+# such a line counts a number of rows in "ratings" which do not appear in "movies".
 anti_join(ratings, movies, by = "movieId")
 
+# We don't need this function anymore
 rm(reset_ID)
 
 #-- PART 2 - kNN: CONTENT BASED RECOMMENDER ###################################
 
+# Purpose: make a recommendation of movie for a given user based on what she was watching before.
+
 #--- 2.1 PREPARE DATA ---------------------------------------------------------
-## rating frequency
+
+## rating frequency: how many times each user rate each movie
 ratings$userId %>% 
     table() %>% 
     as.data.frame() %>% View()
 
-## choose user
+## choose user (arbitrary)
 ratings %>% 
     filter(userId == "547") -> rat547
 
 ## user's rating overview
 rat547 %>% summary()
-seq(0.5,5,by = 0.5) %>% summary()
 
+#seq(0.5,5,by = 0.5) %>% summary()
+
+# Next graph shows that ratings is not "uniform"
 qqplot(seq(0.5,5,by = 0.5), rat547$rating)
 lines(0:5,0:5)
 
@@ -200,16 +241,22 @@ ggplot(rat547, aes(x = timestamp, y = rating)) +
 ## this is a parametr!!!
     ## it's choice needs discussion
 rat547$class = ifelse(rat547$rating > 4, 1, 0)
+
+# just a fraction of rates higher than 4
 mean(rat547$class)
 
+# Use the library with the knn-classifier
 if (!require(class)) {
     install.packages("class")
     library(class)
 }
 
+# Join movies and ratings from the user
 movies547 = left_join(movies,rat547[,c("movieId","class")])
 colnames(movies547)
 
+# Define train and test data.
+# Train data: those with high rating
 moviesTrain = movies547 %>% filter(!is.na(class))
 moviesTest = movies547 %>% filter(is.na(class))
 
@@ -227,23 +274,29 @@ for (i in 1:100) {
             moviesTrain2[,4:22],
             moviesTrain1[,"class"],
             i)
-    
+    # Fraction of truely-classified movies
     result[i] = mean(moviesTrain2$new == moviesTrain2$class)
     print(result[i])
 }
 
 plot(1:i, result, type = "l")
-k = which.max(result)
-k = 2
 
+# Choose "k" to maximize prediction quality
+k = which.max(result)
+# k = 2
+
+# Remove unnecessary variables
 rm(result, moviesTrain1, moviesTrain2, indexTrain1, i)
 
 ##--- 2.3 RECOMMEND -----------------------------------------------------------
 
+# Last step: apply the classificator to test data
 moviesTest$new =
     knn(moviesTrain[,4:22], moviesTest[,4:22], moviesTrain[,"class"], k)
 
+
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
+
 
 moviesTest[moviesTest$new == 1,] %>% View()
 
@@ -264,6 +317,8 @@ if (!require(tidyr)) {
 ratings[c(99041,99132),]
 ratings = ratings[-99132,]
 
+# Pipe-scheme:
+# use ratings sample -> identify ratings>4 -> select necessary columns -> reshape data (columns: users; rows: movies; cells: incidence)
 ratings %>% 
     mutate(class = ifelse(rating > 4, 1, 0)) %>% 
     select(userId, movieId, class) %>%  
@@ -272,22 +327,25 @@ ratings %>%
 rownames(ratM) = ratM$movieId
 ratM$movieId = NULL
 
+# set it as matrix for later use
 ratM %<>% as.matrix()
 
 ##--- 3.2 - ITEM-ITEM ---------------------------------------------------------
 ## way too much for my PC, need to filter
 ratMR = ratM[1:1000,]
 
-## factorisation
+## factorisation: just multiplying the matrix on its transpose
 item = ratMR %*% t(ratMR) 
 
 ## erase self-incidence
 diag(item) = 0
 
 ## choose an user (287 works well)
-user = ratings[sample(1:100000,1), "userId"]
+#user = ratings[sample(1:100000,1), "userId"]
 
-## user movies
+user = 287
+
+## Just select user movies
 ratings %>% 
     filter(userId == user) %>% 
     select(movieId) %>% 
