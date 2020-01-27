@@ -1,18 +1,29 @@
 #####################
 ## Seminar 4       ##
 ## Michal Kubista  ##
-## 23 January 2019 ##
+## 27 January 2020 ##
 #####################
+
+install_and_load = function(name, char = T){
+  if (!require(name, character.only = char)) {
+    install.packages(name)
+  }
+  require(name, character.only = char)
+}
 
 sapply(
     c("data.table","dplyr","magrittr","ggplot2",
       "purrr", "GGally", "cluster", "readxl", "tidyr"),
-    require, character.only = T
+    install_and_load
 )
+
+rm(install_and_load)
 
 #-- PART 1 - kMeans vs hclust #################################################
 
 #--- 1.1 ETL ------------------------------------------------------------------
+##  Data: annual spending in monetary units on diverse product categories
+
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00292/Wholesale%20customers%20data.csv"
 wholesale = fread(url)
 rm(url)
@@ -86,7 +97,12 @@ rm(outIndex, detect_outliers)
 set.seed(12345)
 
 ## elbow estimation
-### are the clusters even there?
+### Number of clusters?
+### Idea: 
+### - run kmeans over several values of k;
+### - compute total within-cluster sum of squared errors (SSE)
+### - choose the small k-value with small SSE
+
 inter = c()
 for (i in 1:10) {
     inter = c(inter, kmeans(wholeC[,-1:-2],i)$tot.withinss)
@@ -101,13 +117,15 @@ lines(c(4,10), inter[c(4,10)], col = "blue")
 (inter / inter[1]) %>% diff(1) * 100
 rm(i,inter)
 
-## "discussion about why to choose k = 2" 
+## The choice of k: Any problems?
 k = 2
 
-## visualisation
+## visualisation: 
+## - Two dimensions (Region and Channel)
 kModel = kmeans(wholeC[,-1:-2],k)
 wholeC$clust = kModel$cluster
 
+## Use ggplot() with geom_jitter() to add some "noise"
 ggplot(wholeC, aes(x = Channel, y = Region, color = as.factor(clust))) +
     geom_jitter()
 
@@ -119,19 +137,22 @@ wholeC %>%
 clusplot(wholeC, kModel$cluster, color = TRUE, shade = T, labels = 1)
 
 #--- 1.3 hClust ----------------------------------------------------------------
+
+## Find distances between all pairs of rows (metrics is important!)
 wholeMat = dist(wholeC[,-1:-2])
 
 # complete with squared distances!
 hModel = hclust(wholeMat, method = "complete")
 plot(hModel)
 
-## find the longest line
+## find the longest line (height!)
 heights = hModel$height 
 
 (diff(heights,lag = 1) %>%
         which.max() %>%
         add(1) %>%
         heights[.] -> h)
+
 
 ## label groups
 rect.hclust(hModel, h = h)
