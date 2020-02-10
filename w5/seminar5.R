@@ -1,7 +1,7 @@
 #####################
 ## Seminar 5       ##
 ## Michal Kubista  ##
-## 10 February 2020 ##
+## 10 February 2020##
 #####################
 
 # install.packages("rpart")
@@ -216,7 +216,7 @@ k = 3
 
 custStats$group = kmeans(custStatsS, k)$cluster
 cluster::clusplot(custStatsS, custStats$group, color = TRUE, shade = T, labels = 1)
-table(custStats$group)
+table(custStats$group) 
 
 tree = rpart(as.factor(group)~., custStats[,-1])
 fancyRpartPlot(tree)
