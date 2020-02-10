@@ -1,7 +1,7 @@
 ---
 title: "Lecture 5"
 author: "Michal Kubi&#353;ta"
-date: "5 February 2019"
+date: "10 February 2020"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -41,13 +41,13 @@ OLS
         
 ## OLS estimation
 $$\hat\beta = (X^{T}X)^{-1}X^{T}y$$
-**n** observations, **k** variables (\* = OK for small **k**)
+**n** observations, **k** variables
 
-- $X^T \; complextity \; O(nk)$ *
-- $X^{T}X = T_{k*k} \; complexity \; O(nk^{2})$ *
-- $T^{-1} = U_{k*k} \; complexity \; O(k^{3})$ *
-- $UX^{T} = V_{k*n} \; complexity \; O(nk^{2})$ *
-- $Vy = W_{k*1} \; complexity \; O(nk)$ *
+- $X^T \; complextity \; O(nk)$
+- $X^{T}X = T_{k*k} \; complexity \; O(nk^{2})$
+- $T^{-1} = U_{k*k} \; complexity \; O(k^{3})$
+- $UX^{T} = V_{k*n} \; complexity \; O(nk^{2})$
+- $Vy = W_{k*1} \; complexity \; O(nk)$
 
 >- what if **k** is not small?
 
