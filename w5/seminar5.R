@@ -75,7 +75,7 @@ pur = raw[,.(pur_ID = unique(`Order ID`),
            by = "Row ID"]
 
 ## WHAT IS THAT SPLITTING GOOD FOR?
-### relational databses logic...
+### relational databases logic...
 object.size(raw) %>% format(units = "Mb")
 
 (object.size(cust) + object.size(loc) + object.size(prod) +
