@@ -1,7 +1,7 @@
 #####################
 ## Seminar 6       ##
 ## Michal Kubista  ##
-## 12 February 2019##
+## 17 February 2020##
 #####################
 
 sapply(
