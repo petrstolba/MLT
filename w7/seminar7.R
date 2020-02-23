@@ -1,8 +1,8 @@
-#####################
-## Seminar 7       ##
-## Michal Kubista  ##
-## 5 March 2019    ##
-#####################
+######################
+## Seminar 7        ##
+## Michal Kubista   ##
+## 24 February 2020 ##
+######################
 
 sapply(
     c("data.table","tidyverse","magrittr", "GGally",
@@ -13,7 +13,10 @@ sapply(
 
 #-- PART 1 - CHURN ############################################################
 #--- 1.1 ETL -------------------------------------------------------------------
-telco = fread("https://community.watsonanalytics.com/wp-content/uploads/2015/03/WA_Fn-UseC_-Telco-Customer-Churn.csv",
+# download from https://www.kaggle.com/blastchar/telco-customer-churn
+unzip("C:/Users/kubistmi/Desktop/telco-customer-churn.zip", exdir = "w7/data") 
+
+telco = fread("w7/data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
               colClasses = c(rep("factor", 5),
                              "numeric",
                              rep("factor", 12),
@@ -52,7 +55,7 @@ tree = rpart(Churn ~., train[,-1], control = cont)
 tree
 tree$cptable
 
-## prune tree
+## prune tree (1 SE rule)
 tree_pruned = prune(tree, 0.0026809651)
 fancyRpartPlot(tree_pruned)
 

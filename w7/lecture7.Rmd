@@ -1,7 +1,7 @@
 ---
 title: "Lecture 7"
 author: "Michal Kubi&#353;ta"
-date: "5 March 2019"
+date: "24 February 2020"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -19,7 +19,6 @@ library(gridExtra)
 library(randomForest)
 library(forestFloor)
 library(inTrees)
-library(mlbench)
 ```
 
 ## Structure
@@ -80,7 +79,7 @@ library(mlbench)
 - first we label the observation randomly
     - with regard to the original proportions in the data
 - we choose observation randomly
-- what is the probability it is correctly classified?
+- what is the probability it is incorrectly classified?
 
 $$G(p) = \sum_{i=1}^{J}p_{i} \sum_{k \neq i}p_{k} = \sum_{i=1}^{J}p_{i}*(1-p_{i}) = \sum_{i=1}^{J}p_{i} - \sum_{i=1}^{J}p_{i}^{2}$$
 
@@ -205,7 +204,7 @@ rpart(as.factor(gear) ~ ., mtcars) %>% fancyRpartPlot()
     - prone to overfitting
 
 ## Bagging
-- ensembling a large number of week learners (models) into one strong
+- ensembling a large number of strong learners (models) into one strong
 - in parallel
     - independent models
 - subsetting observations and variables
