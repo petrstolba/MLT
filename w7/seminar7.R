@@ -4,18 +4,26 @@
 ## 24 February 2020 ##
 ######################
 
+install_and_load = function(name, char = T){
+  if (!require(name, character.only = char)) {
+    install.packages(name)
+  }
+  require(name, character.only = char)
+}
+
 sapply(
     c("data.table","tidyverse","magrittr", "GGally",
-      "rpart", "rattle", "randomForest", "forestFloor", "caret"),
-    require,
-    character.only = T
+      "rpart", "rattle", "randomForest", "forestFloor",
+      "caret","randomForestExplainer"),
+    install_and_load
 )
+
+#devtools::install_version("forestFloor", version = "1.11.1")
+#library("forestFloor")
 
 #-- PART 1 - CHURN ############################################################
 #--- 1.1 ETL -------------------------------------------------------------------
-# download from https://www.kaggle.com/blastchar/telco-customer-churn
-unzip("C:/Users/kubistmi/Desktop/telco-customer-churn.zip", exdir = "w7/data") 
-
+# downloaded from https://www.kaggle.com/blastchar/telco-customer-churn
 telco = fread("w7/data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
               colClasses = c(rep("factor", 5),
                              "numeric",
@@ -84,10 +92,7 @@ test$pred = NULL
 #--- 1.3 FOREST ----------------------------------------------------------------
 rf = randomForest(Churn ~ ., train[,-1])
 
-train[!complete.cases(train),]
-
 ## HEEEEELP!
-##
 
 #---- 1.3.1 randomFOREST -------------------------------------------------------
 rf = randomForest(Churn ~ ., train[,-1], importance = TRUE, keep.inbag = TRUE)
@@ -131,3 +136,5 @@ rf$importance
 
 ff <- forestFloor(rf, train[,-1], binary_reg = T)
 plot(ff, col = fcol(ff, 1), plot_seq = 1:6)
+
+explain_forest(rf, interactions = TRUE, data = train)
