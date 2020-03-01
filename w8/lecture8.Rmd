@@ -1,7 +1,7 @@
 ---
 title: "Lecture 8"
 author: "Michal Kubi&#353;ta"
-date: "12 March 2019"
+date: "2 March 2020"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -27,6 +27,7 @@ library(RCzechia)
 library(sf)
 library(tmap)
 library(leaflet)
+
 
 path = rprojroot::find_rstudio_root_file()
 raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
@@ -243,7 +244,7 @@ htmlwidgets::saveWidget(map_leaf, "map.html", selfcontained = TRUE)
 - presentations (not documents)
 - based on Rmarkdown / remarkjs
 - more configurable while still being very simple
-    - several features are made ven more simple (compared to Slidy / ioslides)
+    - several features are made even more simple (compared to Slidy / ioslides)
         - e.g. incrementality
 
 ## Shiny
