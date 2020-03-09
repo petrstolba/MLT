@@ -50,7 +50,7 @@ server <- function(input, output) {
    output$time = reactive({
        paste0("Analysis of ", input$x, " and ", input$y, " started at ", Sys.time(),
              ". Maximum value of variable ", input$x, " is ", max(mtcars[,input$x]), " initial limit was ", isolate(input$xlim), ".")
-       #iso
+       #isolate
    })
    
    output$plot <- renderPlot({
@@ -63,4 +63,3 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-

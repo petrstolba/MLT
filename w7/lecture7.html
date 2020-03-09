@@ -1354,11 +1354,6 @@ opacity: 0;
 }
 @media print {
 
-@page {
-size: landscape;
-margin: 0;
-}
-
 slides slide {
 display: block !important;
 position: relative;
@@ -3225,7 +3220,7 @@ slide:not(.current) .plotly.html-widget{
 <li>with regard to the original proportions in the data</li>
 </ul></li>
 <li>we choose observation randomly</li>
-<li>what is the probability it is correctly classified?</li>
+<li>what is the probability it is incorrectly classified?</li>
 </ul>
 
 <p>\[G(p) = \sum_{i=1}^{J}p_{i} \sum_{k \neq i}p_{k} = \sum_{i=1}^{J}p_{i}*(1-p_{i}) = \sum_{i=1}^{J}p_{i} - \sum_{i=1}^{J}p_{i}^{2}\]</p>
@@ -3431,39 +3426,39 @@ slide:not(.current) .plotly.html-widget{
 <th align="right">pred</th>
 </tr>
 <tr class="odd">
-<td align="right">1</td>
-<td align="right">0.02</td>
-<td align="right">840.69</td>
-<td align="left">X[,2]&lt;=67</td>
-<td align="right">36.08</td>
+<td align="right">2</td>
+<td align="right">0.00</td>
+<td align="right">9.00</td>
+<td align="left">X[,2]&lt;=81 &amp; X[,6]&lt;=0.681</td>
+<td align="right">77.00</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
+<td align="right">3</td>
 <td align="right">0.01</td>
-<td align="right">235.55</td>
-<td align="left">X[,3]&lt;=7 &amp; X[,6]&lt;=0.4225</td>
-<td align="right">95.14</td>
+<td align="right">141.84</td>
+<td align="left">X[,2]&gt;81 &amp; X[,3]&lt;=5 &amp; X[,6]&lt;=0.681</td>
+<td align="right">102.40</td>
 </tr>
 <tr class="odd">
 <td align="right">2</td>
-<td align="right">0.00</td>
-<td align="right">152.19</td>
-<td align="left">X[,3]&gt;7 &amp; X[,6]&lt;=0.4225</td>
-<td align="right">120.25</td>
+<td align="right">0.04</td>
+<td align="right">698.25</td>
+<td align="left">X[,3]&lt;=5 &amp; X[,6]&gt;0.681</td>
+<td align="right">123.46</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">0.98</td>
-<td align="right">898.02</td>
-<td align="left">X[,2]&gt;67</td>
-<td align="right">122.35</td>
+<td align="right">0.03</td>
+<td align="right">756.67</td>
+<td align="left">X[,2]&lt;=73</td>
+<td align="right">52.00</td>
 </tr>
 <tr class="odd">
-<td align="right">2</td>
-<td align="right">0.00</td>
-<td align="right">99.56</td>
-<td align="left">X[,1]&lt;=0.5 &amp; X[,6]&lt;=1.0025</td>
-<td align="right">104.67</td>
+<td align="right">3</td>
+<td align="right">0.48</td>
+<td align="right">826.70</td>
+<td align="left">X[,2]&gt;73 &amp; X[,4]&lt;=59.5 &amp; X[,5]&lt;=40.55</td>
+<td align="right">121.29</td>
 </tr>
 </table></article></slide>
 
