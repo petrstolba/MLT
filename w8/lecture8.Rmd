@@ -45,7 +45,7 @@ raw = read_excel(file.path(path,"w5/data/transac.xls")) %>% as.data.table()
 ```{r boxplot}
 ggplot(raw, aes(x = Category, y = Discount, group = Category,
                 fill = Category)) +
-           geom_boxplot()
+           geom_boxplot(coef = 1.5)
 ```
 
 ## violin plot
@@ -78,7 +78,7 @@ corrplot::corrplot.mixed(cor_mat, lower.col = "black",
 ## contour
 
 ```{r contour}
-ggplot(raw, aes(x = Quantity, y = Discount)) +
+ggplot(raw, aes(x = Quantity, y = Discount, aes(col = Sales))) +
   geom_density_2d()
 ```
 

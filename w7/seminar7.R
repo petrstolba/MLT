@@ -18,8 +18,8 @@ sapply(
     install_and_load
 )
 
-#devtools::install_version("forestFloor", version = "1.11.1")
-#library("forestFloor")
+# devtools::install_version("forestFloor", version = "1.11.1")
+# library("forestFloor")
 
 #-- PART 1 - CHURN ############################################################
 #--- 1.1 ETL -------------------------------------------------------------------
@@ -29,8 +29,7 @@ telco = fread("w7/data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
                              "numeric",
                              rep("factor", 12),
                              rep("numeric", 2),
-                             "factor"
-                             )
+                             "factor")
               )
 
 str(telco)
@@ -64,7 +63,7 @@ tree
 tree$cptable
 
 ## prune tree (1 SE rule)
-tree_pruned = prune(tree, 0.0026809651)
+tree_pruned = prune(tree, 0.00372882)
 fancyRpartPlot(tree_pruned)
 
 ## trees train accuracy
@@ -130,7 +129,7 @@ errors
 which.max(errors)
 
 ## "best" forest visualisation
-rf = randomForest(Churn ~ ., train[,-1], mtry = 2, importance = TRUE,
+rf = randomForest(Churn ~ ., train[,-1], mtry = 5, importance = TRUE,
                   keep.inbag = T, ntrees = 2000)
 rf$importance
 
