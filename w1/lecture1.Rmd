@@ -1,7 +1,7 @@
 ---
 title: "Lecture 1"
 author: "Michal Kubi&#353;ta"
-date: "6 January 2020"
+date: "6 January 2021"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -27,13 +27,13 @@ library(ggplot2)
 - Contact: michal.kubista@nielsen.com
 - Office hours: upon prior arrangment 
 - I'm bad with names ... *sorry*
-- <font color = "orange">**please include string "MLT2020" in your email subject** </font>
+- <font color = "orange">**please include string "MLT2021" in your email subject** </font>
 
 ## Organization
-- Monday: 16:15 - 19:30
-- Tuesday: 9:30 - 11:00
-    - additional seminar used to wrap up more complex topics (like this week)
-    - otherwise can be used for consultations (pre-agreed via email)
+- Wednesday: 16:15 - 19:30
+- Friday: 9:30 - 11:00
+    - additional seminar used to wrap up more complex topics
+    - otherwise can be used for consultations
 
 ## Content
 - topics in marketing analysis

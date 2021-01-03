@@ -1,7 +1,7 @@
 ####################
 ## Seminar 1      ##
 ## Michal Kubista ##
-## 6 January 2020 ##
+## 6 January 2021 ##
 ####################
 
 sapply(c("data.table","dplyr","magrittr","ggplot2"),
@@ -10,7 +10,7 @@ sapply(c("data.table","dplyr","magrittr","ggplot2"),
 path2data = "w1/data/seminar"
 
 if (!dir.exists(path2data)) {
-    dir.create(path2data, recursive = T)
+  dir.create(path2data, recursive = T)
 }
 
 #-- PART 1 - LOADING TIPS & TRICKS ############################################
@@ -48,9 +48,9 @@ if (!dir.exists(path2data)) {
 #----
 
 auction_Names = function(){
-      files = list.files(path2data, full.names =  T)
-      files = files[grep("auction_day",files)]
-      return(files)
+  files = list.files(path2data, full.names =  T)
+  files = files[grep("auction_day",files)]
+  return(files)
 }
 
 #---- 1.1.1 FOR LOOP ----------------------------------------------------------
@@ -60,7 +60,7 @@ input = list()
 
 # vector growing - BAD IDEA!!!
 for (i in auction_Names()) {
-      input[[length(input) + 1]] = read.csv(i)
+  input[[length(input) + 1]] = read.csv(i)
 }
 
 sapply(input, colnames)
@@ -72,7 +72,7 @@ rm(input, inputTable, i)
 
 input = lapply(auction_Names(), read.csv)
 
-inputTable = do.call(rbind.data.frame,input)
+inputTable = do.call(rbind.data.frame, input)
 
 rm(input, inputTable)
 
@@ -83,7 +83,7 @@ dtTable = dtNames[, fread(file), by = file]
 
 ## shorter version
 dtTable = 
-    data.table::data.table(file = auction_Names())[,fread(file), by = file]
+  data.table::data.table(file = auction_Names())[,fread(file), by = file]
 
 rm(dtNames, dtTable, auction_Names)
 
@@ -94,9 +94,9 @@ rm(dtNames, dtTable, auction_Names)
 # 
 # apply(auction, 2, function(x) length(unique(x)))
 # 
-# auction %>% select(ID, item, auction_type) -> itemTable
-# auction %>% select(ID, price) -> priceTable
-# auction %>% select(-c(item, auction_type, price)) -> auctionTable
+# itemTable = auction %>% select(ID, item, auction_type)
+# priceTable = auction %>% select(ID, price)
+# auctionTable = auction %>% select(-c(item, auction_type, price))
 # 
 # dtOut = data.table(file = c("itemTable","priceTable", "auctionTable"))
 # dtOut[,fwrite(get(file),file.path(path2data,paste0(file,".csv"))),
@@ -106,9 +106,11 @@ rm(dtNames, dtTable, auction_Names)
 # rm(auction, auctionTable, priceTable, itemTable, dtOut)
 #----
 
-(list.files(path2data) %>%
-     grep("Table",.) %>%
-     list.files(path2data, full.names = TRUE)[.] -> inFileNames)
+inFileNames = 
+  list.files(path2data) %>%
+  grep("Table",.) %>%
+  list.files(path2data, full.names = TRUE)[.]
+inFileNames
 
 #---- 1.2.1 DATA.TABLE JOIN --------------------------------------------------
 
@@ -116,14 +118,15 @@ input = lapply(inFileNames, fread)
 names(input) = inFileNames %>% gsub(".*/","",.) %>% gsub(".csv","",.)
 
 dtTable = input$auctionTable[input$itemTable, on = "ID"
-                            ][input$priceTable, on = "ID"]
+                             ][input$priceTable, on = "ID"]
 
 rm(dtTable)
 
 #---- 1.2.2 (D)PLYR JOIN ----------------------------------------------------
 
-dplyr::full_join(input$auctionTable, input$itemTable, by = "ID") %>%
-      full_join(input$priceTable) -> inputTable
+inputTable = 
+  dplyr::full_join(input$auctionTable, input$itemTable, by = "ID") %>%
+  full_join(input$priceTable)
 
 inputTable2 = plyr::join_all(input)
 
@@ -135,7 +138,7 @@ rm(input, inputTable, inputTable2, inFileNames)
 ## script used to create our data:
 # upc = data.table::fread(file.path(path2data,"upc_corpus.csv"))
 # 
-# upc$ean %>% as.numeric() %>% is.na() -> numIndex
+# numIndex = upc$ean %>% as.numeric() %>% is.na()
 # upc$ean[numIndex] = "0"
 # 
 # upcLength = nchar(upc$ean)
@@ -178,11 +181,11 @@ upc %>% head(1000) %>% View()
 upc[9740:9744,]
 
 upc = data.table::fread(file.path(path2data, "upc.csv"),
-                         colClasses = c("character", "character"))
+                        colClasses = c("character", "character"))
 
 ## or in case of large amount of columns
 upc = data.table::fread(file.path(path2data, "upc.csv"),
-             colClasses = c(ean = "character"))
+                        colClasses = c(ean = "character"))
 
 rm(upc)
 
@@ -207,10 +210,10 @@ sum(grepl("rosencrantz", hamText, ignore.case = TRUE))
 length(grep("rosencrantz", hamText, ignore.case = TRUE))
 
 finder = function(name){
-    a = length(grep(name, hamText, ignore.case = TRUE))
-    root = stringr::str_sub(name,1,nchar(name) - 3)
-    b = length(grep(root,hamText, ignore.case = TRUE))
-    return(c(a,b))
+  a = length(grep(name, hamText, ignore.case = TRUE))
+  root = stringr::str_sub(name,1,nchar(name) - 3)
+  b = length(grep(root,hamText, ignore.case = TRUE))
+  return(c(a,b))
 }
 
 finder("hamlet")
@@ -222,35 +225,35 @@ rm(hamText, hamHead, finder)
 ## data origin: https://www.datazar.com/project/p9d520430-ab0a-4f26-a44a-39b08d0e41bb/overview
 
 unzip(
-    file.path(path2data,
-              "fixed-broadband-speeds-postcode-london-2016.xlsx.zip"),
-    exdir = path2data
-    )
+  file.path(path2data,
+            "fixed-broadband-speeds-postcode-london-2016.xlsx.zip"),
+  exdir = path2data
+)
 
 broadband = 
-    readxl::read_excel(
-        file.path(path2data,"fixed-broadband-speeds-postcode-london-2016.xlsx")
-    )
+  readxl::read_excel(
+    file.path(path2data,"fixed-broadband-speeds-postcode-london-2016.xlsx")
+  )
 
 str(broadband)
 
 broadband = broadband[,c(1,8:11,16:19,35,36)]
 colnames(broadband) =
-      c("place", "downAvg", "downMed", "downMin", "downMax", "upAvg", "upMed",
-        "upMin","upMax", "lat","lon")
+  c("place", "downAvg", "downMed", "downMin", "downMax", "upAvg", "upMed",
+    "upMin","upMax", "lat","lon")
 
 summary(broadband)
 
 broadband$downAvg %>%
-      stringr::str_replace("[0-9]*","") %>%
-      stringr::str_replace("[.,][0-9]*","") %>% unique()
+  stringr::str_replace("[0-9]*","") %>%
+  stringr::str_replace("[.,][0-9]*","") %>% unique()
 
 # how to improve this?
 removeStuff = function(x){
-      x %>% stringr::str_replace("<4","2") %>%
-            stringr::str_replace(",","\\.") %>%
-            stringr::str_replace("N/A","") %>%
-            as.numeric()
+  x %>% stringr::str_replace("<4","2") %>%
+    stringr::str_replace(",","\\.") %>%
+    stringr::str_replace("N/A","") %>%
+    as.numeric()
 }
 
 broadband[,-1] = apply(broadband[,-1], 2, removeStuff)
@@ -261,33 +264,33 @@ summary(broadband)
 #---- 2.2.1 DPLYR -------------------------------------------------------------
 
 broadband %>% dplyr::filter(lon > 0, lat > 51.6)
-      
+
 broadband %>%
-      dplyr::select(lon, lat) %>% 
-      dplyr::filter(lon > 0, lat > 51.6)
+  dplyr::select(lon, lat) %>% 
+  dplyr::filter(lon > 0, lat > 51.6)
 
 broadband %>% 
-      dplyr::arrange(downAvg)
+  dplyr::arrange(downAvg)
 
 broadband %>% dplyr::mutate(downRange = downMax - downMin,
                             upRange = upMax - upMin)
 
 broadband %>%
-      dplyr::group_by(downAvg) %>% 
-      dplyr::summarise(meanMax = mean(downMax),
-                       meanMin = mean(downMin)) %>% 
-      dplyr::mutate(meanDif = meanMax - meanMin) %>% 
-      dplyr::arrange(-meanDif)
+  dplyr::group_by(downAvg) %>% 
+  dplyr::summarise(meanMax = mean(downMax),
+                   meanMin = mean(downMin)) %>% 
+  dplyr::mutate(meanDif = meanMax - meanMin) %>% 
+  dplyr::arrange(-meanDif)
 
 #---- 2.2.2 DATA.TABLE --------------------------------------------------------
 
 data.table::as.data.table(broadband)[
-      ,.(meanMax = mean(downMax),
-         meanMin = mean(downMin)),
-      by = downAvg
-      ][,.(downAvg, meanMax, meanMin,
-           meanDif = meanMax - meanMin)
-        ][order(-meanDif)]
+  ,.(meanMax = mean(downMax),
+     meanMin = mean(downMin)),
+  by = downAvg
+  ][,.(downAvg, meanMax, meanMin,
+       meanDif = meanMax - meanMin)
+    ][order(-meanDif)]
 
 #--- 2.3 LONG-WIDE -----------------------------------------------------------
 
@@ -303,12 +306,12 @@ rm(broadband, broadbandWide, broadbandLong, removeStuff)
 #-- PART 3 - EXPLORING TIPS & TRICKS ##########################################
 
 auction = data.table::fread(file.path(path2data,"auction.csv"),
-                             dec = ".", data.table = F)
+                            dec = ".", data.table = F)
 
 #--- 3.1 BASE R
 
 colSelect =
-    !colnames(auction) %in% c("auctionid","bidder","item")
+  !colnames(auction) %in% c("auctionid","bidder","item")
 plot(auction[,colSelect])
 
 #--- 3.2 GGally
@@ -317,7 +320,7 @@ GGally::ggpairs(auction[,colSelect])
 
 #--- 3.3 ORLY?
 url =
-      "http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/orly_owl_files/orly_owl_Lin_4p_5_flat.txt"
+  "http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/orly_owl_files/orly_owl_Lin_4p_5_flat.txt"
 
 orly = read.table(url, header = FALSE)
 
@@ -328,4 +331,4 @@ summary(fit)
 orlyRes = data.frame(fitted = fit$fitted.values, resid = fit$residuals)
 
 ggplot(orlyRes, aes(x = fitted, y = resid)) + 
-      geom_point(size = 2)
+  geom_point(size = 2)
