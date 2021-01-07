@@ -4,6 +4,8 @@
 ## 6 January 2021 ##
 ####################
 
+purrr::map(c("data.table","dplyr","magrittr","ggplot2"), ~require(.x, character.only = T))
+
 sapply(c("data.table","dplyr","magrittr","ggplot2"),
        require,
        character.only = T)
@@ -15,7 +17,7 @@ if (!dir.exists(path2data)) {
 
 #-- PART 1 - LOADING TIPS & TRICKS ############################################
 
-## download data @ https://drive.google.com/drive/folders/1Dyyk2HCaoq4VLQJ3rRnYqmcjFABc_Ssk?usp=sharing
+## download data @ https://drive.google.com/drive/folders/1sJjizO1ycLm4BEZiuFZ8Hmb1KJcD_XLk?usp=sharing
 
 #--- 1.1 SEVERAL SIMILAR FILES ------------------------------------------------
 
@@ -71,6 +73,7 @@ rm(input, inputTable, i)
 #---- 1.1.2. APPLY ------------------------------------------------------------
 
 input = lapply(auction_Names(), read.csv)
+input = purrr::map(auction_Names(), read.csv)
 
 inputTable = do.call(rbind.data.frame, input)
 
@@ -79,7 +82,7 @@ rm(input, inputTable)
 #---- 1.1.3. DATA.TABLE -------------------------------------------------------
 
 dtNames = data.table::data.table(file = auction_Names())
-dtTable = dtNames[, fread(file), by = file]
+dtTable = dtNames[, fread(file), by = file][,-"file"]
 
 ## shorter version
 dtTable = 

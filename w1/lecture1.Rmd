@@ -240,7 +240,7 @@ whether the individual is healthy or not.
 
 - based on mathematical methods
 - very strict framework
-- sometimes you best option
+- sometimes your best option
 </div>
 
 <div style="float: right; width: 50%;">
