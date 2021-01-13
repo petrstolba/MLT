@@ -1,7 +1,7 @@
 #####################
 ## Seminar 2       ##
 ## Michal Kubista  ##
-## 13 January 2020 ##
+## 13 January 2021 ##
 #####################
 
 install_and_load = function(name, char = T){
@@ -27,7 +27,7 @@ if (!dir.exists("w2/data")) {
 
 #--- 1.1 ETL -------------------------------------------------------------------
 # download data from 
-# https://drive.google.com/open?id=1b6UZijHw-xN6dIPTq2RCu3WbmScHkg95
+# https://drive.google.com/drive/folders/1ynL4HLsulRwqbv_L5djmmsRvuuNJKUbn?usp=sharing
 # into w2/data
 
 prodTab = fread("w2/data/prod_structure.csv")
