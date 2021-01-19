@@ -61,7 +61,7 @@ prodTab[product_name %in% prodTab[duplicated(prodTab$product_name), unique(produ
     # classifier, we will split the product_names into three different
     # description columns
 
-inject = function(x){
+inject = function(x) {
       x %>%
         strsplit(split = " ") %>% 
         unlist() %>% 
@@ -101,7 +101,7 @@ if (!require("e1071")) {
 }
 
 ## training
-bayes = naiveBayes(category_name ~ ., train)
+bayes = naiveBayes(category_name ~ ., train, laplace = 1)
 
 # in-sample accuracy?
 train %>% 
@@ -131,7 +131,7 @@ test$ok = test$category_name == test$lab
 sum(test$ok)/nrow(test) * 100
 
 table(test$category_name, test$lab) %>% 
-    print() %>% 
+    # print() %>% 
     as.data.frame() %>% 
     group_by(Var1) %>% 
     summarise(ok = sum((Var1 == Var2)*Freq),
@@ -210,7 +210,9 @@ inject = function(raw){
 # rm(transMat2, i , index, non_list, timeFor, timeApply)
 # ----
 
-system.time({transMat = t(sapply(transRaw$items, inject))})
+system.time({
+  transMat = t(sapply(transRaw$items, inject))
+  })
 
 colnames(transMat) = itemsCh
 rownames(transMat) = 1:nrow(transMat)
@@ -233,7 +235,7 @@ rm(model, ruleTab, transMat)
 
 #--- 2.2 DATAFRAME INPUT -------------------------------------------------------
 ##--- 2.2.1 ETL ----------------------------------------------------------------
-url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00352/Online%20Retail.xlsx" 
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00352/Online%20Retail.xlsx"
 
 download.file(url, "w2/data/online_retail.xlsx", mode = 'wb' )
 
