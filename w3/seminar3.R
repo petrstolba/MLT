@@ -1,7 +1,7 @@
 #####################
 ## Seminar 3       ##
 ## Michal Kubista  ##
-## 20 January 2020 ##
+## 20 January 2021 ##
 #####################
 
 path2data = "w3/data"
@@ -46,7 +46,7 @@ sapply(
 
 #########################################################################
 # DOWNLOAD DATA AT
-# https://drive.google.com/open?id=1t4OJgz9c2d_ki0YS0owBC8Ic_kCHCR6v
+# https://drive.google.com/drive/folders/1pSfHwDtXdSj2CL_oC83My7f7b6ujDGFv?usp=sharing
 #########################################################################
 
 ## read input
@@ -68,7 +68,7 @@ tags %>% summary
 tags$timestamp %<>% as.POSIXct(origin = "1970-01-01")
 
 # Next line does the same withou pipes
-# tags$timestamp <- as.POSIXct(tags$timestamp,origin = "1970-01-01")
+# tags$timestamp = as.POSIXct(tags$timestamp,origin = "1970-01-01")
 
 
 # Count unique elements in the data
@@ -82,7 +82,7 @@ map(tags, ~length(unique(.)))
 # - "select()" chooses only variables which are mentioned (Freq)
 
 tags$userId %>% 
-    table %T>%
+    table() %T>%
     hist() %>%
     as.data.frame() %>% 
     select(Freq) %>% 
@@ -192,7 +192,7 @@ ratings[,1:2] =  apply(ratings[,1:2],2, as.character)
 
 # again, convert time-date to useful format
 ratings$timestamp %<>% as.POSIXct(origin = "1970-01-01")
-#summary(ratings$timestamp)
+summary(ratings$timestamp)
 
 ## count unique elements per column
 map(ratings, ~length(unique(.)))
@@ -210,7 +210,7 @@ rm(reset_ID)
 
 #-- PART 2 - kNN: CONTENT BASED RECOMMENDER ###################################
 
-# Purpose: make a recommendation of movie for a given user based on what she was watching before.
+# Purpose: make a recommendation of movie for a given user based on what they were watching before.
 
 #--- 2.1 PREPARE DATA ---------------------------------------------------------
 
@@ -256,7 +256,7 @@ movies547 = left_join(movies,rat547[,c("movieId","class")])
 colnames(movies547)
 
 # Define train and test data.
-# Train data: those with high rating
+# Train data: those with some rating
 moviesTrain = movies547 %>% filter(!is.na(class))
 moviesTest = movies547 %>% filter(is.na(class))
 
@@ -268,7 +268,7 @@ moviesTrain1 = moviesTrain[indexTrain1,]
 moviesTrain2 = moviesTrain[-indexTrain1,]
 
 result = c()
-for (i in 1:100) {
+for (i in 1:10) {
     moviesTrain2$new =
         knn(moviesTrain1[,4:22],
             moviesTrain2[,4:22],
@@ -297,12 +297,11 @@ moviesTest$new =
 
 movies547[,4:22] %>% map_dbl(mean) %>% .[order(., decreasing = T)]
 
-
-moviesTest[moviesTest$new == 1,] %>% View()
-
 movies547[moviesTest$new == 1,4:22] %>%
     map_dbl(mean) %>%
     .[order(., decreasing = T)]
+
+moviesTest[moviesTest$new == 1,] %>% View()
 
 rm(moviesTest, moviesTrain, movies547, rat547, k)
 
@@ -345,9 +344,9 @@ diag(item) = 0
 
 user = 287
 
-## Just select user movies
+## Select just user movies
 ratings %>% 
-    filter(userId == user) %>% 
+    filter(userId == user, rating > 4) %>% 
     select(movieId) %>% 
     pull(movieId) -> userMov
 
@@ -399,6 +398,7 @@ user[userID,] %in% index %>% which() %>% rownames(user)[.] -> userSim
 
 ## movies watched by similar users 
 (ratings %>% 
+    filter(rating > 4) %>% 
     filter(userId %in% userSim) %>%
     select(movieId) %>%
     table() %>%
