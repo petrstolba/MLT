@@ -1,0 +1,21 @@
+Machine Learning Techniques
+
+Semestral project Spring 2021
+
+Petr Štolba
+
+
+The project information
+
+This project aims to analyse Real Estate Market in Prague based on dataset containing information about prices of housing (flats) with specifications and be able to predict the price of housing based on its specifications within the area. The aim is also to demonstrate importance of using machine learning in real estate.
+
+Prediction of housing prices becomes important when it comes to the transaction of the housing, or when there is a need of knowing actual price of the housing for many other reasons. These reasons can vary from price valuation the housing in order to use housing as a pledge, for arranging an insurance or just simple for the owners to know the price of their property. 
+
+The real challenge for this project would be using it as a support tool for real estate developers for price prediction when deciding about future projects and its location.
+
+In order to get a good estimator, it is important to use right data. As a basis there is a dataset apartment_prague.dta containing 500 observations of housing prices (flats and their specification). This dataset shall be expanded, or it can also be replaced with updated information of larger extend. Other possibility is to use “web scraping“, to get a larger amount of the data. The amount and quality of the data will in the end influence the precision of the predictions. It is also possible to use publicly accessible data from IPR about prices of land SED_CenovaMapa_p.shp which should upgrade the precision of the prediction when it comes to location, which is crucial when talking about real estate.
+
+The estimator itself will be developed in R and it will be a model with the highest success of predictions. For creating the most suitable model for the expected purposes I expect to examine some learning algorithms such as Linear Regression, k-NN algorithm and maybe also Clustering and Random Forrest. The best result may be achieved by combination of above mentioned and it is also possible that another learning algorithm shall be employed. I also expect to use mainly supervised learning algorithms.
+
+The outcome shall be a useful tool which can be used for price prediction. The importance of such a tool is confirmed by many new projects in the field. Some can be named: CenovaMapa.org, CenovaMapa.cz or reas.cz/cenova-mapa and some others. Once the model is finished it can be further improved by employing additional features, which shall allow the higher precision of the price prediction. I hope it can also be used for identifying opportunities in real estate investments. 
+
